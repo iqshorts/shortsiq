@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shorts Analyzer</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --surface2: #1a1a1a;
+    --border: #2a2a2a;
+    --accent: #c8f135;
+    --accent2: #ff6b35;
+    --text: #f0f0f0;
+    --muted: #666;
+    --red: #ff4444;
+    --green: #c8f135;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── HEADER ── */
+  header {
+    padding: 24px 40px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    background: rgba(10,10,10,0.95);
+    backdrop-filter: blur(12px);
+    z-index: 100;
+  }
+
+  .logo {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+  }
+  .logo span { color: var(--accent); }
+
+  .badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    background: var(--accent);
+    color: #000;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+  }
+
+  /* ── LAYOUT ── */
+  .container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  /* ── HERO INPUT ── */
+  .hero {
+    padding: 60px 40px 40px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .hero h1 {
+    font-size: clamp(32px, 5vw, 56px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -2px;
+    margin-bottom: 8px;
+  }
+  .hero h1 em { color: var(--accent); font-style: normal; }
+
+  .hero p {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 32px;
+  }
+
+  .input-row {
+    display: flex;
+    gap: 12px;
+    max-width: 800px;
+  }
+
+  input[type="text"] {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 18px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  input[type="text"]:focus { border-color: var(--accent); }
+  input[type="text"]::placeholder { color: var(--muted); }
+
+  .btn {
+    background: var(--accent);
+    color: #000;
+    border: none;
+    border-radius: 8px;
+    padding: 14px 28px;
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .btn:hover { background: #d4ff3d; transform: translateY(-1px); }
+  .btn:active { transform: translateY(0); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .btn-ghost:hover { background: var(--surface2); border-color: var(--text); }
+
+  .btn-danger {
+    background: var(--red);
+    color: #fff;
+  }
+  .btn-danger:hover { background: #ff6666; }
+
+  /* ── SHORTS GRID ── */
+  .section {
+    padding: 0 40px 40px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-title {
+    font-size: 13px;
+    font-family: 'DM Mono', monospace;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .count-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+    background: rgba(200, 241, 53, 0.1);
+    padding: 4px 10px;
+    border-radius: 20px;
+  }
+
+  .shorts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+  }
+
+  .short-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .short-card:hover { border-color: #444; transform: translateY(-2px); }
+  .short-card.selected {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent);
+  }
+
+  .short-thumb {
+    width: 100%;
+    aspect-ratio: 9/16;
+    object-fit: cover;
+    display: block;
+    background: var(--surface2);
+  }
+
+  .short-info {
+    padding: 12px;
+  }
+
+  .short-title {
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.3;
+    margin-bottom: 6px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .short-views {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .short-views.high { color: var(--accent); }
+  .short-views.low { color: var(--red); }
+
+  .select-indicator {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #000;
+    font-size: 12px;
+    font-weight: 800;
+    display: none;
+    align-items: center;
+    justify-content: center;
+  }
+  .short-card.selected .select-indicator { display: flex; }
+
+  /* ── ANALYSIS PANEL ── */
+  .analyze-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 16px 40px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    z-index: 200;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+  }
+  .analyze-bar.visible { transform: translateY(0); }
+
+  .analyze-bar .selection-info {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    color: var(--muted);
+    flex: 1;
+  }
+  .analyze-bar .selection-info strong { color: var(--text); }
+
+  .mode-select {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 14px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    outline: none;
+    cursor: pointer;
+  }
+
+  /* ── RESULTS ── */
+  .results-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px;
+    margin: 0 40px 120px;
+    max-width: 1320px;
+    margin-left: auto;
+    margin-right: auto;
+    display: none;
+  }
+  .results-panel.visible { display: block; }
+
+  .results-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .results-title {
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .results-body {
+    font-family: 'DM Mono', monospace;
+    font-size: 14px;
+    line-height: 1.8;
+    color: #ddd;
+    white-space: pre-wrap;
+  }
+
+  .results-body h1, .results-body h2, .results-body h3 {
+    font-family: 'Syne', sans-serif;
+    color: var(--text);
+    margin: 24px 0 12px;
+  }
+  .results-body h1 { font-size: 22px; color: var(--accent); }
+  .results-body h2 { font-size: 18px; }
+  .results-body h3 { font-size: 15px; color: var(--accent2); }
+  .results-body strong { color: var(--accent); }
+  .results-body table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 16px 0;
+    font-size: 13px;
+  }
+  .results-body th {
+    background: var(--surface2);
+    padding: 10px 14px;
+    text-align: left;
+    border: 1px solid var(--border);
+    color: var(--accent);
+  }
+  .results-body td {
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+  }
+  .results-body tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+
+  /* ── LOADING ── */
+  .loading-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(10,10,10,0.9);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 500;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .loading-overlay.visible { display: flex; }
+
+  .loading-spinner {
+    width: 48px;
+    height: 48px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .loading-text {
+    font-family: 'DM Mono', monospace;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .loading-status {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+  }
+
+  /* ── EMPTY STATE ── */
+  .empty {
+    text-align: center;
+    padding: 80px 20px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+  }
+  .empty-icon { font-size: 48px; margin-bottom: 16px; }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed;
+    bottom: 80px;
+    right: 40px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 18px;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    z-index: 1000;
+    transform: translateY(20px);
+    opacity: 0;
+    transition: all 0.3s;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.error { border-color: var(--red); color: var(--red); }
+  .toast.success { border-color: var(--accent); color: var(--accent); }
+
+  /* ── UTILS ── */
+  .hidden { display: none; }
+  .flex { display: flex; }
+  .gap-8 { gap: 8px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Shorts<span>IQ</span></div>
+  <div class="badge">BETA</div>
+</header>
+
+<div class="hero">
+  <h1>Decode what makes<br>Shorts <em>go viral.</em></h1>
+  <p>// paste any youtube channel → analyze shorts → find the pattern</p>
+  <div class="input-row">
+    <input type="text" id="channelInput" placeholder="https://www.youtube.com/@channel" />
+    <select class="mode-select" id="limitSelect" style="min-width:120px">
+      <option value="10">10 shorts</option>
+      <option value="20">20 shorts</option>
+      <option value="30" selected>30 shorts</option>
+      <option value="50">50 shorts</option>
+    </select>
+    <button class="btn" id="fetchBtn" onclick="fetchShorts()">Fetch Shorts</button>
+  </div>
+</div>
+
+<!-- Shorts Grid -->
+<div class="section" id="shortsSection" style="display:none">
+  <div class="section-header">
+    <span class="section-title">Shorts</span>
+    <div class="flex gap-8" style="align-items:center">
+      <span class="count-badge" id="countBadge"></span>
+      <button class="btn btn-ghost" style="padding:8px 16px;font-size:13px" onclick="selectAll()">Select All</button>
+      <button class="btn btn-ghost" style="padding:8px 16px;font-size:13px" onclick="clearSelection()">Clear</button>
+    </div>
+  </div>
+  <div class="shorts-grid" id="shortsGrid"></div>
+</div>
+
+<!-- Results -->
+<div class="results-panel" id="resultsPanel">
+  <div class="results-header">
+    <span style="font-size:20px">🔬</span>
+    <div class="results-title">Analysis</div>
+    <button class="btn btn-ghost" style="margin-left:auto;padding:8px 16px;font-size:13px" onclick="closeResults()">Close</button>
+  </div>
+  <div class="results-body" id="resultsBody"></div>
+</div>
+
+<!-- Analyze Bar -->
+<div class="analyze-bar" id="analyzeBar">
+  <div class="selection-info">
+    <strong id="selectedCount">0</strong> videos selected
+  </div>
+  <select class="mode-select" id="modeSelect">
+    <option value="compare">Compare best vs worst</option>
+    <option value="single">Single video analysis</option>
+    <option value="retention">Retention audit</option>
+  </select>
+  <button class="btn" id="analyzeBtn" onclick="analyzeSelected()">Analyze with Claude</button>
+</div>
+
+<!-- Loading -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-spinner"></div>
+  <div class="loading-text" id="loadingText">Fetching data...</div>
+  <div class="loading-status" id="loadingStatus"></div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+  let allShorts = [];
+  let selected = new Set();
+
+  // ── FETCH SHORTS ─────────────────────────────────────────────────────────
+  async function fetchShorts() {
+    const url = document.getElementById('channelInput').value.trim();
+    if (!url) { showToast('Paste a YouTube channel URL first', 'error'); return; }
+
+    const limit = document.getElementById('limitSelect').value;
+    setLoading(true, 'Fetching shorts list...', 'Running yt-dlp...');
+    document.getElementById('fetchBtn').disabled = true;
+
+    try {
+      const res = await fetch('/api/shorts', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ channel_url: url, limit })
+      });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+
+      allShorts = data.shorts;
+      selected.clear();
+      renderShorts();
+      document.getElementById('shortsSection').style.display = 'block';
+      document.getElementById('countBadge').textContent = `${data.count} found`;
+      showToast(`${data.count} Shorts loaded`, 'success');
+    } catch (e) {
+      showToast(e.message, 'error');
+    } finally {
+      setLoading(false);
+      document.getElementById('fetchBtn').disabled = false;
+    }
+  }
+
+  // ── RENDER SHORTS ─────────────────────────────────────────────────────────
+  function renderShorts() {
+    const grid = document.getElementById('shortsGrid');
+    if (!allShorts.length) {
+      grid.innerHTML = '<div class="empty"><div class="empty-icon">📭</div>No shorts found</div>';
+      return;
+    }
+
+    const maxViews = Math.max(...allShorts.map(s => s.views));
+    const minViews = Math.min(...allShorts.map(s => s.views));
+
+    grid.innerHTML = allShorts.map((s, i) => {
+      const viewClass = s.views === maxViews ? 'high' : s.views === minViews ? 'low' : '';
+      const viewStr = formatViews(s.views);
+      const thumb = s.thumbnail || `https://img.youtube.com/vi/${s.id}/hqdefault.jpg`;
+      const isSelected = selected.has(s.id);
+      return `
+        <div class="short-card ${isSelected ? 'selected' : ''}" onclick="toggleSelect('${s.id}')" data-id="${s.id}">
+          <div class="select-indicator">${getSelectionIndex(s.id)}</div>
+          <img class="short-thumb" src="${thumb}" alt="${s.title}" loading="lazy"
+               onerror="this.src='https://img.youtube.com/vi/${s.id}/hqdefault.jpg'">
+          <div class="short-info">
+            <div class="short-title">${s.title}</div>
+            <div class="short-views ${viewClass}">${viewStr} views</div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function getSelectionIndex(id) {
+    const arr = [...selected];
+    const idx = arr.indexOf(id);
+    return idx >= 0 ? idx + 1 : '';
+  }
+
+  function toggleSelect(id) {
+    if (selected.has(id)) {
+      selected.delete(id);
+    } else {
+      selected.add(id);
+    }
+    renderShorts();
+    updateAnalyzeBar();
+  }
+
+  function selectAll() {
+    allShorts.forEach(s => selected.add(s.id));
+    renderShorts();
+    updateAnalyzeBar();
+  }
+
+  function clearSelection() {
+    selected.clear();
+    renderShorts();
+    updateAnalyzeBar();
+  }
+
+  function updateAnalyzeBar() {
+    const bar = document.getElementById('analyzeBar');
+    const count = selected.size;
+    document.getElementById('selectedCount').textContent = count;
+    bar.classList.toggle('visible', count > 0);
+
+    // Frame quality indicator — mirrors backend logic
+    const badge = document.getElementById('frameBadge');
+    const LIMIT = 98;
+    const idealHook = 30;
+    let hookPer, midtailPer, label, color, bg;
+
+    if (idealHook * count <= LIMIT * 0.7) {
+      hookPer = idealHook;
+    } else {
+      hookPer = Math.max(6, Math.floor(LIMIT * 0.7 / count));
+    }
+    midtailPer = Math.max(0, Math.floor((LIMIT - hookPer * count) / count));
+
+    if (count <= 2) {
+      label = 'ULTRA'; color = '#c8f135'; bg = 'rgba(200,241,53,0.15)';
+    } else if (count <= 4) {
+      label = 'HIGH'; color = '#ffa500'; bg = 'rgba(255,165,0,0.15)';
+    } else if (count <= 7) {
+      label = 'MEDIUM'; color = '#ff8c00'; bg = 'rgba(255,165,0,0.1)';
+    } else {
+      label = 'MINIMAL'; color = '#ff4444'; bg = 'rgba(255,68,68,0.1)';
+    }
+
+    badge.textContent = hookPer + ' hook + ' + midtailPer + ' mid/tail · ' + label;
+    badge.style.background = bg;
+    badge.style.color = color;
+    badge.style.borderColor = color;
+  }
+
+  // ── ANALYZE ───────────────────────────────────────────────────────────────
+  async function analyzeSelected() {
+    if (!selected.size) return;
+    const mode = document.getElementById('modeSelect').value;
+    const videoIds = [...selected];
+    const titlesMap = {};
+    const viewsMap = {};
+    allShorts.forEach(s => {
+      titlesMap[s.id] = s.title;
+      viewsMap[s.id] = s.views;
+    });
+
+    setLoading(true, 'Scraping video frames & transcripts...', `Processing ${videoIds.length} video(s) — this takes 1-2 min`);
+
+    try {
+      const res = await fetch('/api/analyze', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          video_ids: videoIds,
+          titles: titlesMap,
+          views: viewsMap,
+          mode
+        })
+      });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      showResults(data.analysis, data.frame_note, data.frames_per_video);
+    } catch (e) {
+      showToast(e.message, 'error');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function showResults(markdown, frameNote, framesPerVideo) {
+    const panel = document.getElementById('resultsPanel');
+    const body = document.getElementById('resultsBody');
+    const title = document.querySelector('.results-title');
+    if (frameNote) {
+      title.innerHTML = `Analysis <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);font-weight:400;margin-left:8px">${frameNote}</span>`;
+    }
+    body.innerHTML = renderMarkdown(markdown);
+    panel.classList.add('visible');
+    panel.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function closeResults() {
+    document.getElementById('resultsPanel').classList.remove('visible');
+  }
+
+  // ── MARKDOWN RENDERER ─────────────────────────────────────────────────────
+  function renderMarkdown(text) {
+    return text
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+      .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+      .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g, '<em>$1</em>')
+      .replace(/^- (.+)$/gm, '<li>$1</li>')
+      .replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>')
+      .replace(/\n\n/g, '<br><br>')
+      .replace(/\n/g, '\n');
+  }
+
+  // ── UTILS ─────────────────────────────────────────────────────────────────
+  function formatViews(n) {
+    if (!n) return '—';
+    if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
+    if (n >= 1000) return (n / 1000).toFixed(0) + 'K';
+    return n.toString();
+  }
+
+  function setLoading(show, text = '', status = '') {
+    const overlay = document.getElementById('loadingOverlay');
+    overlay.classList.toggle('visible', show);
+    document.getElementById('loadingText').textContent = text;
+    document.getElementById('loadingStatus').textContent = status;
+  }
+
+  function showToast(msg, type = '') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = `toast ${type} show`;
+    setTimeout(() => { t.className = 'toast'; }, 3000);
+  }
+
+  // Enter key on input
+  document.getElementById('channelInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') fetchShorts();
+  });
+</script>
+</body>
+</html>
