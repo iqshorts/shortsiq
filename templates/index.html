@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ShortsIQ — YouTube Shorts Intelligence</title>
+<title>ShortsIQ by Gearshift Media</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -21,8 +21,15 @@ header{position:sticky;top:0;z-index:100;background:rgba(8,8,8,0.95);backdrop-fi
 .logo-dot{width:8px;height:8px;background:var(--accent);border-radius:50%;animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
 .logo span{color:var(--accent)}
+.logo-by{font-size:10px;font-weight:400;color:var(--text3);font-family:var(--mono);letter-spacing:0.5px}
+.logo-by a{color:var(--text3);text-decoration:none}
+.logo-by a:hover{color:var(--text2)}
 .pill{font-family:var(--mono);font-size:11px;padding:4px 10px;border-radius:20px;border:1px solid var(--border2);color:var(--text2)}
 .header-right{display:flex;align-items:center;gap:12px}
+.channel-pill-wrap{display:none;align-items:center;gap:6px}
+.channel-pill-name{font-family:var(--mono);font-size:11px;color:var(--text2);padding:4px 10px;border-radius:20px;border:1px solid var(--border2)}
+.copy-btn{width:24px;height:24px;background:transparent;border:1px solid var(--border2);border-radius:5px;color:var(--text3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;transition:all 0.15s}
+.copy-btn:hover{border-color:var(--accent);color:var(--accent)}
 
 .layout{display:grid;grid-template-columns:272px 1fr;min-height:calc(100vh - 56px)}
 
@@ -32,18 +39,37 @@ header{position:sticky;top:0;z-index:100;background:rgba(8,8,8,0.95);backdrop-fi
 .channel-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;color:var(--text);font-family:var(--mono);font-size:12px;outline:none;transition:border-color 0.2s}
 .channel-input:focus{border-color:var(--accent)}
 .channel-input::placeholder{color:var(--text3)}
-
 .input-row{display:flex;gap:6px;margin-top:8px}
 .limit-sel{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-family:var(--mono);font-size:11px;outline:none;cursor:pointer}
 .fetch-btn{flex:1;background:var(--accent);color:#000;border:none;border-radius:8px;padding:10px;font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s}
 .fetch-btn:hover{background:#c8ff70}
 .fetch-btn:disabled{opacity:0.4;cursor:not-allowed}
-
 .save-btn{width:100%;margin-top:6px;font-family:var(--mono);font-size:11px;color:var(--accent);background:var(--accent-dim);border:1px solid rgba(184,255,87,0.2);border-radius:6px;padding:6px 10px;cursor:pointer;transition:all 0.15s}
 .save-btn:hover{background:rgba(184,255,87,0.2)}
 
+/* Folders */
+.folders-wrap{display:flex;flex-direction:column;gap:6px}
+.folder-item{border-radius:8px;overflow:hidden;border:1px solid var(--border)}
+.folder-header{display:flex;align-items:center;gap:8px;padding:7px 10px;cursor:pointer;background:var(--surface2);transition:all 0.15s}
+.folder-header:hover{background:var(--surface3)}
+.folder-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.folder-name{font-size:12px;font-weight:500;flex:1}
+.folder-arrow{font-size:10px;color:var(--text3);transition:transform 0.2s}
+.folder-item.open .folder-arrow{transform:rotate(90deg)}
+.folder-channels{display:none;flex-direction:column;gap:2px;padding:4px 6px 6px}
+.folder-item.open .folder-channels{display:flex}
+.folder-ch{display:flex;align-items:center;justify-content:space-between;padding:5px 8px;border-radius:5px;cursor:pointer;font-size:11px;font-family:var(--mono);transition:all 0.15s}
+.folder-ch:hover{background:var(--surface3)}
+.folder-ch-rm{color:var(--text3);font-size:13px}
+.folder-ch-rm:hover{color:var(--accent2)}
+.folder-actions{display:flex;gap:4px;padding:4px 6px 6px}
+.folder-add-btn{flex:1;font-family:var(--mono);font-size:10px;color:var(--text3);background:transparent;border:1px dashed var(--border2);border-radius:5px;padding:4px 8px;cursor:pointer;text-align:center;transition:all 0.15s}
+.folder-add-btn:hover{border-color:var(--accent);color:var(--accent)}
+.new-folder-btn{width:100%;font-family:var(--mono);font-size:11px;color:var(--text3);background:transparent;border:1px dashed var(--border2);border-radius:7px;padding:7px;cursor:pointer;transition:all 0.15s;margin-top:4px}
+.new-folder-btn:hover{border-color:var(--accent);color:var(--accent)}
+
 .saved-channels{display:flex;flex-direction:column;gap:5px}
-.saved-ch{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;cursor:pointer;transition:all 0.15s;font-size:12px}
+.saved-ch{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;cursor:pointer;transition:all 0.15s;font-size:12px;font-family:var(--mono)}
 .saved-ch:hover{border-color:var(--border2);background:var(--surface3)}
 .saved-ch-rm{color:var(--text3);font-size:15px;line-height:1}
 .saved-ch-rm:hover{color:var(--accent2)}
@@ -63,7 +89,6 @@ header{position:sticky;top:0;z-index:100;background:rgba(8,8,8,0.95);backdrop-fi
 .hist-meta{font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:2px}
 
 .main{padding:24px 28px}
-
 .stats-banner{display:none;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
 .stats-banner.visible{display:grid}
 .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px}
@@ -110,15 +135,16 @@ header{position:sticky;top:0;z-index:100;background:rgba(8,8,8,0.95);backdrop-fi
 .analyze-btn:hover{background:#c8ff70}
 .analyze-btn:disabled{opacity:0.4;cursor:not-allowed}
 
+/* Results panel */
 .results-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.8);backdrop-filter:blur(4px);z-index:500;display:none;align-items:flex-end;justify-content:center}
 .results-overlay.visible{display:flex}
-.results-panel{background:var(--surface);border:1px solid var(--border);border-radius:16px 16px 0 0;width:100%;max-width:860px;max-height:85vh;overflow:hidden;display:flex;flex-direction:column;animation:slideUp 0.35s cubic-bezier(0.34,1.56,0.64,1)}
+.results-panel{background:var(--surface);border:1px solid var(--border);border-radius:16px 16px 0 0;width:100%;max-width:860px;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;animation:slideUp 0.35s cubic-bezier(0.34,1.56,0.64,1)}
 @keyframes slideUp{from{transform:translateY(100%)}}
 .results-hdr{padding:18px 24px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0}
 .results-title{font-size:15px;font-weight:600;flex:1}
 .results-meta{font-family:var(--mono);font-size:10px;color:var(--text3)}
 .results-actions{display:flex;gap:6px}
-.results-body{padding:20px 24px 24px;overflow-y:auto;flex:1;line-height:1.75;font-size:14px;color:#ddd}
+.results-body{padding:20px 24px 0;overflow-y:auto;flex:1;line-height:1.75;font-size:14px;color:#ddd}
 .results-body h1{font-size:19px;color:var(--accent);margin:0 0 14px;letter-spacing:-0.5px}
 .results-body h2{font-size:15px;color:var(--text);margin:20px 0 8px;padding-bottom:7px;border-bottom:1px solid var(--border)}
 .results-body h3{font-size:13px;color:var(--accent3);margin:14px 0 6px}
@@ -133,6 +159,21 @@ header{position:sticky;top:0;z-index:100;background:rgba(8,8,8,0.95);backdrop-fi
 .results-body code{font-family:var(--mono);font-size:11px;background:var(--surface2);padding:2px 5px;border-radius:3px;color:var(--accent3)}
 .results-body blockquote{border-left:3px solid var(--accent);padding-left:14px;margin:10px 0;color:var(--text2)}
 .results-body hr{border:none;border-top:1px solid var(--border);margin:18px 0}
+
+/* Chat */
+.chat-section{border-top:1px solid var(--border);flex-shrink:0;display:flex;flex-direction:column;max-height:280px}
+.chat-messages{overflow-y:auto;padding:12px 24px;display:flex;flex-direction:column;gap:10px;flex:1}
+.chat-msg{max-width:85%;padding:10px 14px;border-radius:10px;font-size:13px;line-height:1.5}
+.chat-msg.user{align-self:flex-end;background:var(--accent-dim);border:1px solid rgba(184,255,87,0.2);color:var(--text)}
+.chat-msg.assistant{align-self:flex-start;background:var(--surface2);border:1px solid var(--border);color:#ddd}
+.chat-msg.thinking{color:var(--text3);font-style:italic;font-size:12px}
+.chat-input-row{display:flex;gap:8px;padding:12px 24px;border-top:1px solid var(--border);flex-shrink:0}
+.chat-input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-family:var(--sans);font-size:13px;outline:none;resize:none;height:38px;transition:border-color 0.2s}
+.chat-input:focus{border-color:var(--accent)}
+.chat-input::placeholder{color:var(--text3)}
+.chat-send-btn{background:var(--accent);color:#000;border:none;border-radius:8px;padding:9px 16px;font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;white-space:nowrap}
+.chat-send-btn:hover{background:#c8ff70}
+.chat-send-btn:disabled{opacity:0.4;cursor:not-allowed}
 
 .loading-overlay{position:fixed;inset:0;background:rgba(8,8,8,0.93);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:1000;gap:18px}
 .loading-overlay.visible{display:flex}
@@ -149,6 +190,23 @@ header{position:sticky;top:0;z-index:100;background:rgba(8,8,8,0.95);backdrop-fi
 .toast.success{border-color:var(--accent);color:var(--accent)}
 .toast.error{border-color:var(--accent2);color:var(--accent2)}
 
+/* Color picker modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:800;display:none;align-items:center;justify-content:center}
+.modal-overlay.visible{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;width:300px;display:flex;flex-direction:column;gap:14px}
+.modal-title{font-size:14px;font-weight:600}
+.modal-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:9px 12px;color:var(--text);font-family:var(--mono);font-size:13px;outline:none}
+.modal-input:focus{border-color:var(--accent)}
+.color-row{display:flex;gap:8px;flex-wrap:wrap}
+.color-swatch{width:28px;height:28px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all 0.15s}
+.color-swatch:hover,.color-swatch.selected{border-color:#fff;transform:scale(1.15)}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end}
+.modal-btn{padding:8px 16px;border-radius:7px;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all 0.15s}
+.modal-btn.primary{background:var(--accent);color:#000}
+.modal-btn.primary:hover{background:#c8ff70}
+.modal-btn.ghost{background:var(--surface2);color:var(--text2);border:1px solid var(--border)}
+.modal-btn.ghost:hover{border-color:var(--border2);color:var(--text)}
+
 @media(max-width:768px){
   .layout{grid-template-columns:1fr}
   .sidebar{position:static;height:auto;border-right:none;border-bottom:1px solid var(--border)}
@@ -160,9 +218,16 @@ header{position:sticky;top:0;z-index:100;background:rgba(8,8,8,0.95);backdrop-fi
 </head>
 <body>
 <header>
-  <div class="logo"><div class="logo-dot"></div>Shorts<span>IQ</span></div>
+  <div class="logo">
+    <div class="logo-dot"></div>
+    Shorts<span>IQ</span>
+    <span class="logo-by">by <a href="https://gearshiftmedia.co" target="_blank">Gearshift Media</a></span>
+  </div>
   <div class="header-right">
-    <div class="pill" id="channelPill" style="display:none"></div>
+    <div class="channel-pill-wrap" id="channelPillWrap">
+      <div class="channel-pill-name" id="channelPillName"></div>
+      <button class="copy-btn" onclick="copyChannelUrl()" title="Copy channel URL">⎘</button>
+    </div>
     <div class="pill">BETA</div>
   </div>
 </header>
@@ -184,8 +249,14 @@ header{position:sticky;top:0;z-index:100;background:rgba(8,8,8,0.95);backdrop-fi
     <button class="save-btn" id="saveBtn" onclick="saveChannel()" style="display:none">+ Save Channel</button>
   </div>
 
+  <div id="foldersSection">
+    <div class="sec-label">Folders</div>
+    <div class="folders-wrap" id="foldersWrap"></div>
+    <button class="new-folder-btn" onclick="openNewFolderModal()">+ New Folder</button>
+  </div>
+
   <div id="savedSection" style="display:none">
-    <div class="sec-label">Saved</div>
+    <div class="sec-label">Uncategorized</div>
     <div class="saved-channels" id="savedChannels"></div>
   </div>
 
@@ -218,7 +289,6 @@ header{position:sticky;top:0;z-index:100;background:rgba(8,8,8,0.95);backdrop-fi
     <div class="stat-card"><div class="stat-label">Avg Views</div><div class="stat-value blue" id="statAvgViews">—</div></div>
     <div class="stat-card"><div class="stat-label">Top Short</div><div class="stat-value" id="statTop">—</div></div>
   </div>
-
   <div class="toolbar" id="toolbar">
     <div class="toolbar-left">
       <div class="count-tag" id="countTag"></div>
@@ -229,7 +299,6 @@ header{position:sticky;top:0;z-index:100;background:rgba(8,8,8,0.95);backdrop-fi
       <button class="icon-btn" onclick="clearSelection()" title="Clear">✕</button>
     </div>
   </div>
-
   <div class="shorts-grid" id="shortsGrid">
     <div class="empty-state" style="grid-column:1/-1">
       <div class="empty-icon">📡</div>
@@ -252,6 +321,7 @@ header{position:sticky;top:0;z-index:100;background:rgba(8,8,8,0.95);backdrop-fi
   <button class="analyze-btn" id="analyzeBtn" onclick="analyze()">Analyze with Claude →</button>
 </div>
 
+<!-- Results overlay -->
 <div class="results-overlay" id="resultsOverlay" onclick="closeResults(event)">
   <div class="results-panel" onclick="event.stopPropagation()">
     <div class="results-hdr">
@@ -260,10 +330,31 @@ header{position:sticky;top:0;z-index:100;background:rgba(8,8,8,0.95);backdrop-fi
       <div class="results-meta" id="resultsMeta"></div>
       <div class="results-actions">
         <button class="icon-btn" onclick="copyResults()" title="Copy">📋</button>
+        <button class="icon-btn" onclick="exportPDF()" title="Export PDF">📄</button>
         <button class="icon-btn" onclick="closeResults()" title="Close">✕</button>
       </div>
     </div>
-    <div class="results-body" id="resultsBody"></div>
+    <div class="results-body" id="resultsBody" style="padding-bottom:20px"></div>
+    <div class="chat-section" id="chatSection">
+      <div class="chat-messages" id="chatMessages"></div>
+      <div class="chat-input-row">
+        <input type="text" class="chat-input" id="chatInput" placeholder="Ask a follow-up question..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}" />
+        <button class="chat-send-btn" id="chatSendBtn" onclick="sendChat()">Send</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Folder modal -->
+<div class="modal-overlay" id="folderModal" onclick="closeFolderModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-title" id="folderModalTitle">New Folder</div>
+    <input type="text" class="modal-input" id="folderNameInput" placeholder="Folder name..." />
+    <div class="color-row" id="colorRow"></div>
+    <div class="modal-actions">
+      <button class="modal-btn ghost" onclick="closeFolderModal()">Cancel</button>
+      <button class="modal-btn primary" onclick="saveFolder()">Save</button>
+    </div>
   </div>
 </div>
 
@@ -272,24 +363,50 @@ header{position:sticky;top:0;z-index:100;background:rgba(8,8,8,0.95);backdrop-fi
   <div class="loading-text" id="loadingText">Working...</div>
   <div class="loading-status" id="loadingStatus"></div>
 </div>
-
 <div class="toast" id="toast"></div>
 
 <script>
-let allShorts=[],filteredShorts=[],selected=new Set(),currentChannel='',avgViews=0,currentSort='default';
+// ── STATE ──────────────────────────────────────────────────────────────────
+let allShorts=[],filteredShorts=[],selected=new Set(),currentChannel='',currentChannelUrl='',avgViews=0,currentSort='default';
 let analysisHistory=JSON.parse(localStorage.getItem('shortsiq_history')||'[]');
 let savedChannels=JSON.parse(localStorage.getItem('shortsiq_channels')||'[]');
+let folders=JSON.parse(localStorage.getItem('shortsiq_folders')||'[]');
+let currentResults='',chatHistory=[],currentAnalysisContext='';
+let editingFolderIdx=null,selectedColor='#b8ff57';
+
+const FOLDER_COLORS=['#b8ff57','#57b8ff','#ff5757','#ff9f57','#c457ff','#57ffcc','#ff57c4','#fff'];
 
 document.addEventListener('DOMContentLoaded',()=>{
-  renderSavedChannels();renderHistory();
+  renderSavedChannels();renderHistory();renderFolders();renderColorRow();
   document.getElementById('channelInput').addEventListener('keydown',e=>{if(e.key==='Enter')fetchShorts();});
 });
+
+// ── UTILS ──────────────────────────────────────────────────────────────────
+function extractHandle(raw){
+  if(!raw) return raw;
+  const match = raw.match(/@([a-zA-Z0-9_.-]+)/);
+  return match ? '@'+match[1] : raw;
+}
+function buildUrl(raw){
+  if(raw.startsWith('http')) return raw;
+  const handle = raw.startsWith('@') ? raw : '@'+raw;
+  return 'https://www.youtube.com/'+handle;
+}
+function fmtViews(n){if(!n&&n!==0)return'—';if(n>=1000000)return(n/1000000).toFixed(1)+'M';if(n>=1000)return(n/1000).toFixed(0)+'K';return n.toString();}
+function showToast(msg,type=''){const t=document.getElementById('toast');t.textContent=msg;t.className='toast '+type+' show';setTimeout(()=>t.className='toast',3000);}
+function setLoading(show,text='',status=''){document.getElementById('loadingOverlay').classList.toggle('visible',show);document.getElementById('loadingText').textContent=text;document.getElementById('loadingStatus').textContent=status;}
+
+// ── CHANNEL ────────────────────────────────────────────────────────────────
+function copyChannelUrl(){
+  navigator.clipboard.writeText(currentChannelUrl).then(()=>showToast('Channel URL copied','success'));
+}
 
 async function fetchShorts(){
   const raw=document.getElementById('channelInput').value.trim();
   if(!raw){showToast('Enter a channel URL or @handle','error');return;}
-  const url=raw.startsWith('http')?raw:`https://www.youtube.com/${raw.startsWith('@')?raw:'@'+raw}`;
-  currentChannel=raw;
+  const url=buildUrl(raw);
+  currentChannel=extractHandle(raw);
+  currentChannelUrl=url;
   const limit=document.getElementById('limitSelect').value;
   setLoading(true,'Fetching Shorts list...','Running yt-dlp...');
   document.getElementById('fetchBtn').disabled=true;
@@ -299,7 +416,7 @@ async function fetchShorts(){
     if(data.error)throw new Error(data.error);
     allShorts=data.shorts;filteredShorts=[...allShorts];selected.clear();
     renderStats();renderGrid();showUI();
-    showToast(`${data.count} Shorts loaded`,'success');
+    showToast(data.count+' Shorts loaded','success');
   }catch(e){showToast(e.message,'error');}
   finally{setLoading(false);document.getElementById('fetchBtn').disabled=false;}
 }
@@ -313,8 +430,8 @@ function renderStats(){
   document.getElementById('statAvgViews').textContent=fmtViews(avgViews);
   document.getElementById('statTop').textContent=fmtViews(topViews);
   document.getElementById('statsBanner').classList.add('visible');
-  document.getElementById('channelPill').textContent=currentChannel;
-  document.getElementById('channelPill').style.display='block';
+  document.getElementById('channelPillName').textContent=currentChannel;
+  document.getElementById('channelPillWrap').style.display='flex';
   document.getElementById('saveBtn').style.display='block';
 }
 
@@ -325,19 +442,18 @@ function renderGrid(){
     const ratio=avgViews>0?s.views/avgViews:1;
     const vc=ratio>=3?'viral':ratio>=1.2?'good':ratio>=0.5?'avg':'low';
     const badge=ratio>=3?'<div class="viral-badge viral">viral</div>':ratio<0.4?'<div class="viral-badge low">low</div>':'';
-    const dur=s.duration?`<div class="dur-tag">${s.duration}s</div>`:'';
+    const dur=s.duration?'<div class="dur-tag">'+s.duration+'s</div>':'';
     const isSel=selected.has(s.id);
     const selIdx=isSel?[...selected].indexOf(s.id)+1:'';
-    const thumb=s.thumbnail||`https://img.youtube.com/vi/${s.id}/hqdefault.jpg`;
-    return `<div class="short-card ${isSel?'selected':''}" onclick="toggleSelect('${s.id}')" data-id="${s.id}">
-      <div class="select-num">${selIdx}</div>${dur}
-      <img class="short-thumb" src="${thumb}" loading="lazy" onerror="this.src='https://img.youtube.com/vi/${s.id}/hqdefault.jpg'">
-      <div class="short-info">
-        <div class="short-title">${s.title}</div>
-        <div class="short-meta"><div class="short-views ${vc}">${fmtViews(s.views)}</div>${badge}</div>
-      </div></div>`;
+    const thumb=s.thumbnail||'https://img.youtube.com/vi/'+s.id+'/hqdefault.jpg';
+    return '<div class="short-card '+(isSel?'selected':'')+'" onclick="toggleSelect(\''+s.id+'\')" data-id="'+s.id+'">'
+      +'<div class="select-num">'+selIdx+'</div>'+dur
+      +'<img class="short-thumb" src="'+thumb+'" loading="lazy" onerror="this.src=\'https://img.youtube.com/vi/'+s.id+'/hqdefault.jpg\'">'
+      +'<div class="short-info"><div class="short-title">'+s.title+'</div>'
+      +'<div class="short-meta"><div class="short-views '+vc+'">'+fmtViews(s.views)+'</div>'+badge+'</div>'
+      +'</div></div>';
   }).join('');
-  document.getElementById('countTag').textContent=`${filteredShorts.length} shorts`;
+  document.getElementById('countTag').textContent=filteredShorts.length+' shorts';
 }
 
 function toggleSelect(id){selected.has(id)?selected.delete(id):selected.add(id);renderGrid();updateBar();}
@@ -362,15 +478,11 @@ function updateBar(){
   else if(count<=4){label='HIGH';color='#ffa500';bg='rgba(255,165,0,0.12)';}
   else if(count<=7){label='MEDIUM';color='#ff8c00';bg='rgba(255,140,0,0.1)';}
   else{label='MINIMAL';color='#ff5757';bg='rgba(255,87,87,0.1)';}
-  badge.textContent=`${hookPer} hook + ${midPer} mid · ${label}`;
-  badge.style.cssText=`background:${bg};color:${color};border-color:${color}`;
+  badge.textContent=hookPer+' hook + '+midPer+' mid · '+label;
+  badge.style.cssText='background:'+bg+';color:'+color+';border-color:'+color;
 }
 
-function sortShorts(type,btn){
-  currentSort=type;
-  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');applyFilters();
-}
+function sortShorts(type,btn){currentSort=type;document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');applyFilters();}
 function filterShorts(){applyFilters();}
 function applyFilters(){
   const q=document.getElementById('searchInput').value.toLowerCase();
@@ -382,41 +494,273 @@ function applyFilters(){
   filteredShorts=r;renderGrid();
 }
 
+// ── ANALYZE ────────────────────────────────────────────────────────────────
 async function analyze(){
   if(!selected.size)return;
   const mode=document.getElementById('modeSelect').value;
   const ids=[...selected];
   const titlesMap={},viewsMap={};
   allShorts.forEach(s=>{titlesMap[s.id]=s.title;viewsMap[s.id]=s.views;});
-  setLoading(true,`Analyzing ${ids.length} video(s)...`,'Downloading frames + transcripts — 1-3 min');
+  setLoading(true,'Analyzing '+ids.length+' video(s)...','Downloading frames + transcripts — 1-3 min');
   try{
     const res=await fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({video_ids:ids,titles:titlesMap,views:viewsMap,mode})});
     const data=await res.json();
     if(data.error)throw new Error(data.error);
-    showResults(data.analysis,data.frame_note,ids.length,mode);
+    showResults(data.analysis,data.frame_note,ids.length,mode,ids.map(id=>titlesMap[id]),viewsMap);
     saveToHistory(data.analysis,ids.map(id=>titlesMap[id]),mode);
   }catch(e){showToast(e.message,'error');}
   finally{setLoading(false);}
 }
 
-let currentResults='';
-function showResults(markdown,frameNote,count,mode){
+// ── RESULTS ────────────────────────────────────────────────────────────────
+function showResults(markdown,frameNote,count,mode,titles,views){
   currentResults=markdown;
+  chatHistory=[];
+  // Build context for chat
+  currentAnalysisContext='Channel: '+currentChannel+'\nMode: '+mode+'\nVideos analyzed: '+count+'\n';
+  if(titles) currentAnalysisContext+='Videos: '+titles.join(', ')+'\n';
+  currentAnalysisContext+='\nFull analysis:\n'+markdown;
+
   document.getElementById('resultsTitle').textContent=mode==='compare'?'Viral Analysis':mode==='retention'?'Retention Audit':'Deep Dive';
-  document.getElementById('resultsMeta').textContent=`${count} video${count>1?'s':''} · ${frameNote||''}`;
+  document.getElementById('resultsMeta').textContent=count+' video'+(count>1?'s':'')+' · '+(frameNote||'');
   document.getElementById('resultsBody').innerHTML=parseMd(markdown);
+  document.getElementById('chatMessages').innerHTML='<div class="chat-msg thinking">Ask me anything about this analysis — I have full context on the videos, transcripts, and frames.</div>';
   document.getElementById('resultsOverlay').classList.add('visible');
 }
-function closeResults(e){if(!e||e.target===document.getElementById('resultsOverlay'))document.getElementById('resultsOverlay').classList.remove('visible');}
+
+function closeResults(e){
+  if(!e||e.target===document.getElementById('resultsOverlay')){
+    document.getElementById('resultsOverlay').classList.remove('visible');
+  }
+}
 function copyResults(){navigator.clipboard.writeText(currentResults).then(()=>showToast('Copied','success'));}
+
+// ── CHAT ────────────────────────────────────────────────────────────────────
+async function sendChat(){
+  const input=document.getElementById('chatInput');
+  const msg=input.value.trim();
+  if(!msg)return;
+  input.value='';
+  document.getElementById('chatSendBtn').disabled=true;
+
+  const messages=document.getElementById('chatMessages');
+
+  // Add user message
+  chatHistory.push({role:'user',content:msg});
+  messages.innerHTML+='<div class="chat-msg user">'+msg+'</div>';
+  messages.innerHTML+='<div class="chat-msg thinking" id="chatThinking">Thinking...</div>';
+  messages.scrollTop=messages.scrollHeight;
+
+  try{
+    const res=await fetch('/api/chat',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({messages:chatHistory,context:currentAnalysisContext,channel:currentChannel})
+    });
+    const data=await res.json();
+    if(data.error)throw new Error(data.error);
+
+    document.getElementById('chatThinking').remove();
+    chatHistory.push({role:'assistant',content:data.reply});
+    messages.innerHTML+='<div class="chat-msg assistant">'+parseMd(data.reply)+'</div>';
+    messages.scrollTop=messages.scrollHeight;
+  }catch(e){
+    document.getElementById('chatThinking').remove();
+    messages.innerHTML+='<div class="chat-msg thinking">Error: '+e.message+'</div>';
+  }finally{
+    document.getElementById('chatSendBtn').disabled=false;
+    input.focus();
+  }
+}
+
+// ── HISTORY ────────────────────────────────────────────────────────────────
+function saveToHistory(analysis,titles,mode){
+  const item={id:Date.now(),mode,titles:titles.slice(0,2).join(', '),channel:currentChannel,analysis,date:new Date().toLocaleDateString()};
+  analysisHistory.unshift(item);analysisHistory=analysisHistory.slice(0,20);
+  localStorage.setItem('shortsiq_history',JSON.stringify(analysisHistory));renderHistory();
+}
+function renderHistory(){
+  const list=document.getElementById('historyList'),section=document.getElementById('historySection');
+  if(!analysisHistory.length){section.style.display='none';return;}
+  section.style.display='block';
+  const groups={};
+  analysisHistory.forEach(item=>{
+    const ch=item.channel||'Unknown';
+    if(!groups[ch])groups[ch]=[];
+    groups[ch].push(item);
+  });
+  list.innerHTML=Object.entries(groups).map(([ch,items])=>
+    '<div style="margin-bottom:12px">'
+    +'<div style="font-family:var(--mono);font-size:10px;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;padding:0 2px">'+ch+'</div>'
+    +items.map(item=>'<div class="hist-item" onclick="loadHistory('+item.id+')">'
+      +'<div class="hist-title">'+(item.titles||'Analysis')+'</div>'
+      +'<div class="hist-meta">'+item.mode+' · '+item.date+'</div>'
+      +'</div>').join('')
+    +'</div>'
+  ).join('');
+}
+function loadHistory(id){const item=analysisHistory.find(h=>h.id===id);if(item)showResults(item.analysis,'',0,item.mode,[],{});}
+
+// ── SAVED CHANNELS ─────────────────────────────────────────────────────────
+function saveChannel(){
+  const handle=currentChannel;
+  if(!handle)return;
+  // Check not already in a folder or saved
+  const inFolder=folders.some(f=>f.channels&&f.channels.includes(handle));
+  if(inFolder){showToast('Already in a folder','error');return;}
+  if(savedChannels.includes(handle)){showToast('Already saved','error');return;}
+  savedChannels.push(handle);
+  localStorage.setItem('shortsiq_channels',JSON.stringify(savedChannels));
+  renderSavedChannels();showToast('Channel saved','success');
+}
+function renderSavedChannels(){
+  const el=document.getElementById('savedChannels'),section=document.getElementById('savedSection');
+  if(!savedChannels.length){section.style.display='none';return;}
+  section.style.display='block';
+  el.innerHTML=savedChannels.map((ch,i)=>'<div class="saved-ch" onclick="loadSaved(\''+ch+'\')">'
+    +'<div>'+ch+'</div>'
+    +'<div class="saved-ch-rm" onclick="event.stopPropagation();removeCh('+i+')">×</div>'
+    +'</div>').join('');
+}
+function loadSaved(ch){document.getElementById('channelInput').value=ch;fetchShorts();}
+function removeCh(i){savedChannels.splice(i,1);localStorage.setItem('shortsiq_channels',JSON.stringify(savedChannels));renderSavedChannels();}
+
+// ── FOLDERS ────────────────────────────────────────────────────────────────
+function renderFolders(){
+  const wrap=document.getElementById('foldersWrap');
+  if(!folders.length){wrap.innerHTML='';return;}
+  wrap.innerHTML=folders.map((f,fi)=>{
+    const channels=(f.channels||[]).map((ch,ci)=>'<div class="folder-ch" onclick="loadSaved(\''+ch+'\')"><span>'+ch+'</span>'
+      +'<span class="folder-ch-rm" onclick="event.stopPropagation();removeFolderCh('+fi+','+ci+')">×</span>'
+      +'</div>').join('');
+    return '<div class="folder-item" id="folder-'+fi+'">'
+      +'<div class="folder-header" onclick="toggleFolder('+fi+')">'
+      +'<div class="folder-dot" style="background:'+f.color+'"></div>'
+      +'<div class="folder-name">'+f.name+'</div>'
+      +'<span style="font-size:10px;color:var(--text3);margin-right:4px">'+(f.channels||[]).length+'</span>'
+      +'<span class="folder-arrow">▶</span>'
+      +'<div style="display:flex;gap:4px;margin-left:4px" onclick="event.stopPropagation()">'
+      +'<div style="font-size:11px;color:var(--text3);cursor:pointer;padding:2px 4px" onclick="editFolder('+fi+')" title="Edit">✏</div>'
+      +'<div style="font-size:11px;color:var(--text3);cursor:pointer;padding:2px 4px" onclick="deleteFolder('+fi+')" title="Delete">🗑</div>'
+      +'</div>'
+      +'</div>'
+      +'<div class="folder-channels">'+channels
+      +'<div class="folder-actions"><button class="folder-add-btn" onclick="addCurrentToFolder('+fi+')">+ Add current channel</button></div>'
+      +'</div></div>';
+  }).join('');
+}
+
+function toggleFolder(fi){
+  const el=document.getElementById('folder-'+fi);
+  el.classList.toggle('open');
+}
+
+function addCurrentToFolder(fi){
+  const ch=currentChannel;
+  if(!ch){showToast('Fetch a channel first','error');return;}
+  if(!folders[fi].channels)folders[fi].channels=[];
+  if(folders[fi].channels.includes(ch)){showToast('Already in this folder','error');return;}
+  folders[fi].channels.push(ch);
+  // Remove from uncategorized if there
+  const idx=savedChannels.indexOf(ch);
+  if(idx>-1){savedChannels.splice(idx,1);localStorage.setItem('shortsiq_channels',JSON.stringify(savedChannels));renderSavedChannels();}
+  saveFolders();renderFolders();showToast('Added to '+folders[fi].name,'success');
+}
+
+function removeFolderCh(fi,ci){
+  folders[fi].channels.splice(ci,1);
+  saveFolders();renderFolders();
+}
+
+function deleteFolder(fi){
+  // Move channels back to uncategorized
+  const chs=folders[fi].channels||[];
+  chs.forEach(ch=>{if(!savedChannels.includes(ch))savedChannels.push(ch);});
+  localStorage.setItem('shortsiq_channels',JSON.stringify(savedChannels));
+  folders.splice(fi,1);
+  saveFolders();renderFolders();renderSavedChannels();
+}
+
+function saveFolders(){localStorage.setItem('shortsiq_folders',JSON.stringify(folders));}
+
+// Folder modal
+function renderColorRow(){
+  document.getElementById('colorRow').innerHTML=FOLDER_COLORS.map(c=>
+    '<div class="color-swatch'+(c===selectedColor?' selected':'')+'" style="background:'+c+'" onclick="selectFolderColor(\''+c+'\')" title="'+c+'"></div>'
+  ).join('');
+}
+
+function selectFolderColor(c){
+  selectedColor=c;
+  document.querySelectorAll('.color-swatch').forEach(s=>s.classList.remove('selected'));
+  event.target.classList.add('selected');
+}
+
+function openNewFolderModal(){
+  editingFolderIdx=null;
+  selectedColor='#b8ff57';
+  document.getElementById('folderModalTitle').textContent='New Folder';
+  document.getElementById('folderNameInput').value='';
+  renderColorRow();
+  document.getElementById('folderModal').classList.add('visible');
+  setTimeout(()=>document.getElementById('folderNameInput').focus(),100);
+}
+
+function editFolder(fi){
+  editingFolderIdx=fi;
+  selectedColor=folders[fi].color||'#b8ff57';
+  document.getElementById('folderModalTitle').textContent='Edit Folder';
+  document.getElementById('folderNameInput').value=folders[fi].name;
+  renderColorRow();
+  document.getElementById('folderModal').classList.add('visible');
+}
+
+function closeFolderModal(e){
+  if(!e||e.target===document.getElementById('folderModal'))
+    document.getElementById('folderModal').classList.remove('visible');
+}
+
+function saveFolder(){
+  const name=document.getElementById('folderNameInput').value.trim();
+  if(!name){showToast('Enter a folder name','error');return;}
+  if(editingFolderIdx!==null){
+    folders[editingFolderIdx].name=name;
+    folders[editingFolderIdx].color=selectedColor;
+  }else{
+    folders.push({name,color:selectedColor,channels:[]});
+  }
+  saveFolders();renderFolders();
+  document.getElementById('folderModal').classList.remove('visible');
+}
+
+// ── LOAD MORE ──────────────────────────────────────────────────────────────
+async function loadMore(){
+  const url=buildUrl(document.getElementById('channelInput').value.trim());
+  const newLimit=allShorts.length+20;
+  setLoading(true,'Loading more...','');
+  try{
+    const res=await fetch('/api/shorts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({channel_url:url,limit:newLimit})});
+    const data=await res.json();
+    allShorts=data.shorts;filteredShorts=[...allShorts];renderStats();renderGrid();
+    showToast(data.count+' Shorts loaded','success');
+  }catch(e){showToast(e.message,'error');}
+  finally{setLoading(false);}
+}
+
+function showUI(){
+  document.getElementById('toolbar').classList.add('visible');
+  document.getElementById('filterSection').style.display='block';
+  document.getElementById('loadMoreBtn').classList.add('visible');
+}
+
+// ── MARKDOWN ────────────────────────────────────────────────────────────────
 function parseMd(t){
   t=t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  // Tables
-  const tableRegex = /^(\|.+\|)\n(\|[-| :]+\|)\n((\|.+\|\n?)+)/gm;
-  t=t.replace(tableRegex, function(match, header, sep, rows){
-    const headers = header.split('|').filter(c=>c.trim()).map(c=>'<th>'+c.trim()+'</th>').join('');
-    const bodyRows = rows.trim().split('\n').map(row=>{
-      const cells = row.split('|').filter(c=>c.trim()).map(c=>'<td>'+c.trim()+'</td>').join('');
+  const tableRegex=/^(\|.+\|)\n(\|[-| :]+\|)\n((\|.+\|\n?)+)/gm;
+  t=t.replace(tableRegex,function(match,header,sep,rows){
+    const headers=header.split('|').filter(c=>c.trim()).map(c=>'<th>'+c.trim()+'</th>').join('');
+    const bodyRows=rows.trim().split('\n').map(row=>{
+      const cells=row.split('|').filter(c=>c.trim()).map(c=>'<td>'+c.trim()+'</td>').join('');
       return '<tr>'+cells+'</tr>';
     }).join('');
     return '<table><thead><tr>'+headers+'</tr></thead><tbody>'+bodyRows+'</tbody></table>';
@@ -429,77 +773,48 @@ function parseMd(t){
   t=t.replace(/`(.+?)`/g,'<code>$1</code>');
   t=t.replace(/^---$/gm,'<hr>');
   t=t.replace(/^&gt; (.+)$/gm,'<blockquote>$1</blockquote>');
-  t=t.replace(/^[\-\*] (.+)$/gm,'<li>$1</li>');
+  t=t.replace(/^[-*] (.+)$/gm,'<li>$1</li>');
   t=t.replace(/\n\n/g,'<br><br>');
   return t;
 }
 
-function saveToHistory(analysis,titles,mode){
-  const item={id:Date.now(),mode,titles:titles.slice(0,2).join(', '),channel:currentChannel,analysis,date:new Date().toLocaleDateString()};
-  analysisHistory.unshift(item);analysisHistory=analysisHistory.slice(0,10);
-  localStorage.setItem('shortsiq_history',JSON.stringify(analysisHistory));renderHistory();
-}
-function renderHistory(){
-  const list=document.getElementById('historyList'),section=document.getElementById('historySection');
-  if(!analysisHistory.length){section.style.display='none';return;}
-  section.style.display='block';
-  // Group by channel
-  const groups={};
-  analysisHistory.forEach(item=>{
-    const ch=item.channel||'Unknown';
-    if(!groups[ch])groups[ch]=[];
-    groups[ch].push(item);
-  });
-  list.innerHTML=Object.entries(groups).map(([ch,items])=>`
-    <div style="margin-bottom:12px">
-      <div style="font-family:var(--mono);font-size:10px;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;padding:0 2px">${ch}</div>
-      ${items.map(item=>`<div class="hist-item" onclick="loadHistory(${item.id})"><div class="hist-title">${item.titles||'Analysis'}</div><div class="hist-meta">${item.mode} · ${item.date}</div></div>`).join('')}
-    </div>
-  `).join('');
-}
-function loadHistory(id){const item=analysisHistory.find(h=>h.id===id);if(item)showResults(item.analysis,'',0,item.mode);}
-
-function saveChannel(){
-  if(!currentChannel||savedChannels.includes(currentChannel))return;
-  savedChannels.push(currentChannel);localStorage.setItem('shortsiq_channels',JSON.stringify(savedChannels));
-  renderSavedChannels();showToast('Channel saved','success');
-}
-function renderSavedChannels(){
-  const el=document.getElementById('savedChannels'),section=document.getElementById('savedSection');
-  if(!savedChannels.length){section.style.display='none';return;}
-  section.style.display='block';
-  el.innerHTML=savedChannels.map((ch,i)=>`<div class="saved-ch" onclick="loadSaved('${ch}')"><div>${ch}</div><div class="saved-ch-rm" onclick="event.stopPropagation();removeCh(${i})">×</div></div>`).join('');
-}
-function loadSaved(ch){document.getElementById('channelInput').value=ch;fetchShorts();}
-function removeCh(i){savedChannels.splice(i,1);localStorage.setItem('shortsiq_channels',JSON.stringify(savedChannels));renderSavedChannels();}
-
-async function loadMore(){
-  const url=document.getElementById('channelInput').value.trim();
-  const newLimit=allShorts.length+20;
-  setLoading(true,'Loading more...','');
-  try{
-    const res=await fetch('/api/shorts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({channel_url:url,limit:newLimit})});
-    const data=await res.json();
-    allShorts=data.shorts;filteredShorts=[...allShorts];renderStats();renderGrid();
-    showToast(`${data.count} Shorts loaded`,'success');
-  }catch(e){showToast(e.message,'error');}
-  finally{setLoading(false);}
-}
-
-function showUI(){
-  document.getElementById('toolbar').classList.add('visible');
-  document.getElementById('filterSection').style.display='block';
-  document.getElementById('loadMoreBtn').classList.add('visible');
-}
-function setLoading(show,text='',status=''){
-  document.getElementById('loadingOverlay').classList.toggle('visible',show);
-  document.getElementById('loadingText').textContent=text;
-  document.getElementById('loadingStatus').textContent=status;
-}
-function fmtViews(n){if(!n&&n!==0)return '—';if(n>=1000000)return(n/1000000).toFixed(1)+'M';if(n>=1000)return(n/1000).toFixed(0)+'K';return n.toString();}
-function showToast(msg,type=''){
-  const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;
-  setTimeout(()=>t.className='toast',3000);
+// ── EXPORT PDF ─────────────────────────────────────────────────────────────
+async function exportPDF(){
+  const title=document.getElementById('resultsTitle').textContent;
+  const meta=document.getElementById('resultsMeta').textContent;
+  const body=document.getElementById('resultsBody').innerHTML;
+  const date=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  const styles=[
+    "body{font-family:'Space Grotesk',sans-serif;max-width:800px;margin:0 auto;padding:48px 40px;color:#1a1a1a;line-height:1.7}",
+    ".header{border-bottom:3px solid #b8ff57;padding-bottom:20px;margin-bottom:32px}",
+    ".brand{font-size:13px;font-family:monospace;color:#666;margin-bottom:8px}",
+    ".report-title{font-size:28px;font-weight:700;letter-spacing:-0.5px;margin:0 0 6px}",
+    ".report-meta{font-family:monospace;font-size:12px;color:#888}",
+    "h1{font-size:20px;color:#1a1a1a;border-left:4px solid #b8ff57;padding-left:12px;margin:28px 0 12px}",
+    "h2{font-size:16px;font-weight:600;margin:24px 0 8px;border-bottom:1px solid #eee;padding-bottom:6px}",
+    "h3{font-size:14px;color:#444;margin:16px 0 6px}",
+    "strong{color:#000}",
+    "table{width:100%;border-collapse:collapse;margin:16px 0;font-size:13px}",
+    "th{background:#f5f5f5;padding:10px 12px;text-align:left;border:1px solid #ddd}",
+    "td{padding:10px 12px;border:1px solid #ddd}",
+    "tr:nth-child(even) td{background:#fafafa}",
+    "ul,ol{padding-left:20px}li{margin:4px 0}",
+    "blockquote{border-left:3px solid #b8ff57;padding-left:14px;margin:12px 0;color:#555}",
+    "hr{border:none;border-top:1px solid #eee;margin:20px 0}",
+    ".footer{margin-top:48px;padding-top:16px;border-top:1px solid #eee;font-family:monospace;font-size:11px;color:#aaa;display:flex;justify-content:space-between}"
+  ].join('\n');
+  const htmlContent='<html><head><meta charset="UTF-8"><title>'+title+' - ShortsIQ</title><style>'+styles+'</style></head><body>'
+    +'<div class="header"><div class="brand">SHORTSIQ by Gearshift Media</div>'
+    +'<div class="report-title">'+title+'</div>'
+    +'<div class="report-meta">Channel: '+currentChannel+' · '+meta+' · Generated '+date+'</div></div>'
+    +body
+    +'<div class="footer"><span>ShortsIQ by Gearshift Media</span><span>app.shortsiq.app</span></div>'
+    +'</body></html>';
+  const blob=new Blob([htmlContent],{type:'text/html'});
+  const url=URL.createObjectURL(blob);
+  const win=window.open(url,'_blank');
+  if(win){win.onload=()=>{setTimeout(()=>{win.print();},500);};}
+  showToast('Opening print dialog — save as PDF','success');
 }
 </script>
 </body>

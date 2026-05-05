@@ -318,6 +318,26 @@ def api_shorts():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
+@flask_app.route("/api/chat", methods=["POST"])
+def api_chat():
+    data = request.json
+    messages = data.get("messages", [])
+    context = data.get("context", "")
+    if not messages:
+        return jsonify({"error": "No messages"}), 400
+    try:
+        system = "You are a YouTube Shorts growth strategist. Context from analysis:\n" + context + "\n\nBe specific, reference actual videos and data. Keep responses concise but insightful."
+        response = client.messages.create(
+            model="claude-sonnet-4-5",
+            max_tokens=1000,
+            system=system,
+            messages=messages
+        )
+        return jsonify({"reply": response.content[0].text})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 @flask_app.route("/api/analyze", methods=["POST"])
 def api_analyze():
     data = request.json
