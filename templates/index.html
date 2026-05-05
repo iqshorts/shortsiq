@@ -236,7 +236,7 @@ header{position:sticky;top:0;z-index:100;background:rgba(8,8,8,0.95);backdrop-fi
 <aside class="sidebar">
   <div>
     <div class="sec-label">Channel</div>
-    <input type="text" class="channel-input" id="channelInput" placeholder="@channel or full URL" />
+    <input type="text" class="channel-input" id="channelInput" placeholder="@MrBeast or full URL" />
     <div class="input-row">
       <select class="limit-sel" id="limitSelect">
         <option value="10">10 shorts</option>
@@ -303,7 +303,7 @@ header{position:sticky;top:0;z-index:100;background:rgba(8,8,8,0.95);backdrop-fi
     <div class="empty-state" style="grid-column:1/-1">
       <div class="empty-icon">📡</div>
       <div>Paste a YouTube channel to get started</div>
-      <div style="color:var(--text3);font-size:11px;margin-top:4px">e.g. @southfloridapokemon</div>
+      <div style="color:var(--text3);font-size:11px;margin-top:4px">e.g. @MrBeast</div>
     </div>
   </div>
   <button class="load-more-btn" id="loadMoreBtn" onclick="loadMore()">Load 20 more shorts</button>
@@ -380,9 +380,31 @@ let editingFolderIdx=null,selectedColor='#b8ff57';
 const FOLDER_COLORS=['#b8ff57','#57b8ff','#ff5757','#ff9f57','#c457ff','#57ffcc','#ff57c4','#fff'];
 
 document.addEventListener('DOMContentLoaded',()=>{
+  migrateStoredData();
   renderSavedChannels();renderHistory();renderFolders();renderColorRow();
   document.getElementById('channelInput').addEventListener('keydown',e=>{if(e.key==='Enter')fetchShorts();});
+  document.addEventListener('click',()=>closeAllDropdowns());
 });
+
+function migrateStoredData(){
+  // Convert any stored full URLs to @handle format
+  savedChannels=savedChannels.map(ch=>extractHandle(ch)||ch);
+  localStorage.setItem('shortsiq_channels',JSON.stringify(savedChannels));
+  analysisHistory=analysisHistory.map(item=>{
+    if(item.channel)item.channel=extractHandle(item.channel)||item.channel;
+    return item;
+  });
+  localStorage.setItem('shortsiq_history',JSON.stringify(analysisHistory));
+  folders=folders.map(f=>{
+    if(f.channels)f.channels=f.channels.map(ch=>extractHandle(ch)||ch);
+    return f;
+  });
+  localStorage.setItem('shortsiq_folders',JSON.stringify(folders));
+}
+
+function closeAllDropdowns(){
+  document.querySelectorAll('.assign-dropdown').forEach(d=>d.remove());
+}
 
 // ── UTILS ──────────────────────────────────────────────────────────────────
 function extractHandle(raw){
@@ -603,10 +625,15 @@ function renderHistory(){
     +'<span style="font-size:9px;color:var(--text3)" id="arr-'+gid+'">▶</span>'
     +'</div>'
     +'<div id="'+gid+'" style="display:none;flex-direction:column;gap:3px;padding-left:6px">'
-    +items.map(item=>'<div class="hist-item" onclick="loadHistory('+item.id+')">'
-      +'<div class="hist-title">'+(item.titles||'Analysis')+'</div>'
+    +items.map(item=>'<div class="hist-item" style="position:relative">'
+      +'<div onclick="loadHistory('+item.id+')">'
+      +'<div class="hist-title" id="htitle-'+item.id+'">'+(item.titles||'Analysis')+'</div>'
       +'<div class="hist-meta">'+item.mode+' · '+item.date+'</div>'
-      +'</div>').join('')
+      +'</div>'
+      +'<div style="display:flex;gap:4px;position:absolute;top:6px;right:6px">'
+      +'<div style="font-size:11px;color:var(--text3);cursor:pointer;padding:2px 4px;border-radius:3px" title="Rename" onclick="event.stopPropagation();renameHistory('+item.id+')">✏</div>'
+      +'<div style="font-size:11px;color:var(--text3);cursor:pointer;padding:2px 4px;border-radius:3px" title="Delete" onclick="event.stopPropagation();deleteHistory('+item.id+')">×</div>'
+      +'</div></div>').join('')
     +'</div></div>';
   }).join('');
 }
@@ -618,6 +645,31 @@ function toggleHistGroup(gid){
   arr.textContent=open?'▼':'▶';
 }
 function loadHistory(id){const item=analysisHistory.find(h=>h.id===id);if(item)showResults(item.analysis,'',0,item.mode,[],{});}
+function renameHistory(id){
+  const item=analysisHistory.find(h=>h.id===id);
+  if(!item)return;
+  const el=document.getElementById('htitle-'+id);
+  if(!el)return;
+  const old=item.titles||'Analysis';
+  const input=document.createElement('input');
+  input.value=old;
+  input.style.cssText='width:100%;background:var(--surface3);border:1px solid var(--accent);border-radius:4px;padding:2px 6px;color:var(--text);font-size:12px;font-family:var(--mono);outline:none';
+  el.replaceWith(input);
+  input.focus();input.select();
+  function save(){
+    const newTitle=input.value.trim()||old;
+    item.titles=newTitle;
+    localStorage.setItem('shortsiq_history',JSON.stringify(analysisHistory));
+    renderHistory();
+  }
+  input.addEventListener('blur',save);
+  input.addEventListener('keydown',e=>{if(e.key==='Enter')save();if(e.key==='Escape'){input.value=old;save();}});
+}
+function deleteHistory(id){
+  analysisHistory=analysisHistory.filter(h=>h.id!==id);
+  localStorage.setItem('shortsiq_history',JSON.stringify(analysisHistory));
+  renderHistory();
+}
 
 // ── SAVED CHANNELS ─────────────────────────────────────────────────────────
 function saveChannel(){
