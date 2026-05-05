@@ -410,7 +410,10 @@ function closeAllDropdowns(){
 function extractHandle(raw){
   if(!raw) return raw;
   const match = raw.match(/@([a-zA-Z0-9_.-]+)/);
-  return match ? '@'+match[1] : raw;
+  if(match) return '@'+match[1];
+  // If it's already just a handle without @ (e.g. "southfloridapokemon"), add @
+  if(!raw.startsWith('http') && !raw.startsWith('@')) return '@'+raw;
+  return raw;
 }
 function buildUrl(raw){
   if(raw.startsWith('http')) return raw;
