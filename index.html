@@ -3,709 +3,529 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Shorts Analyzer</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<title>ShortsIQ by Gearshift Media</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #0a0a0a;
-    --surface: #111111;
-    --surface2: #1a1a1a;
-    --border: #2a2a2a;
-    --accent: #c8f135;
-    --accent2: #ff6b35;
-    --text: #f0f0f0;
-    --muted: #666;
-    --red: #ff4444;
-    --green: #c8f135;
-  }
+:root {
+  --bg:#080808;--surface:#111;--surface2:#181818;--surface3:#222;
+  --border:#2a2a2a;--border2:#333;--accent:#b8ff57;--accent-dim:rgba(184,255,87,0.12);
+  --accent2:#ff5757;--accent3:#57b8ff;--text:#f0f0f0;--text2:#999;--text3:#555;
+  --radius:10px;--mono:'JetBrains Mono',monospace;--sans:'Space Grotesk',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+header{position:sticky;top:0;z-index:100;background:rgba(8,8,8,0.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 32px;height:56px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-size:17px;font-weight:700;letter-spacing:-0.5px;display:flex;align-items:center;gap:10px}
+.logo-dot{width:8px;height:8px;background:var(--accent);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+.logo span{color:var(--accent)}
+.pill{font-family:var(--mono);font-size:11px;padding:4px 10px;border-radius:20px;border:1px solid var(--border2);color:var(--text2)}
+.header-right{display:flex;align-items:center;gap:12px}
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Syne', sans-serif;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
+.layout{display:grid;grid-template-columns:272px 1fr;min-height:calc(100vh - 56px)}
 
-  /* ── HEADER ── */
-  header {
-    padding: 24px 40px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    position: sticky;
-    top: 0;
-    background: rgba(10,10,10,0.95);
-    backdrop-filter: blur(12px);
-    z-index: 100;
-  }
+.sidebar{border-right:1px solid var(--border);padding:20px 16px;position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto;display:flex;flex-direction:column;gap:20px}
+.sec-label{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);margin-bottom:8px}
 
-  .logo {
-    font-size: 20px;
-    font-weight: 800;
-    letter-spacing: -0.5px;
-  }
-  .logo span { color: var(--accent); }
+.channel-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;color:var(--text);font-family:var(--mono);font-size:12px;outline:none;transition:border-color 0.2s}
+.channel-input:focus{border-color:var(--accent)}
+.channel-input::placeholder{color:var(--text3)}
 
-  .badge {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    background: var(--accent);
-    color: #000;
-    padding: 3px 8px;
-    border-radius: 4px;
-    font-weight: 500;
-  }
+.input-row{display:flex;gap:6px;margin-top:8px}
+.limit-sel{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-family:var(--mono);font-size:11px;outline:none;cursor:pointer}
+.fetch-btn{flex:1;background:var(--accent);color:#000;border:none;border-radius:8px;padding:10px;font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s}
+.fetch-btn:hover{background:#c8ff70}
+.fetch-btn:disabled{opacity:0.4;cursor:not-allowed}
 
-  /* ── LAYOUT ── */
-  .container {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 40px;
-  }
+.save-btn{width:100%;margin-top:6px;font-family:var(--mono);font-size:11px;color:var(--accent);background:var(--accent-dim);border:1px solid rgba(184,255,87,0.2);border-radius:6px;padding:6px 10px;cursor:pointer;transition:all 0.15s}
+.save-btn:hover{background:rgba(184,255,87,0.2)}
 
-  /* ── HERO INPUT ── */
-  .hero {
-    padding: 60px 40px 40px;
-    max-width: 1400px;
-    margin: 0 auto;
-  }
+.saved-channels{display:flex;flex-direction:column;gap:5px}
+.saved-ch{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;cursor:pointer;transition:all 0.15s;font-size:12px}
+.saved-ch:hover{border-color:var(--border2);background:var(--surface3)}
+.saved-ch-rm{color:var(--text3);font-size:15px;line-height:1}
+.saved-ch-rm:hover{color:var(--accent2)}
 
-  .hero h1 {
-    font-size: clamp(32px, 5vw, 56px);
-    font-weight: 800;
-    line-height: 1.05;
-    letter-spacing: -2px;
-    margin-bottom: 8px;
-  }
-  .hero h1 em { color: var(--accent); font-style: normal; }
+.filter-group{display:flex;flex-direction:column;gap:7px}
+.filter-row{display:flex;gap:5px}
+.filter-btn{flex:1;font-family:var(--mono);font-size:10px;padding:6px 4px;background:var(--surface2);border:1px solid var(--border);border-radius:5px;color:var(--text2);cursor:pointer;transition:all 0.15s;text-align:center}
+.filter-btn:hover,.filter-btn.active{border-color:var(--accent);color:var(--accent);background:var(--accent-dim)}
+.search-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:7px 10px;color:var(--text);font-family:var(--mono);font-size:11px;outline:none}
+.search-input:focus{border-color:var(--border2)}
+.search-input::placeholder{color:var(--text3)}
 
-  .hero p {
-    font-family: 'DM Mono', monospace;
-    font-size: 13px;
-    color: var(--muted);
-    margin-bottom: 32px;
-  }
+.history-list{display:flex;flex-direction:column;gap:5px}
+.hist-item{padding:8px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;cursor:pointer;transition:all 0.15s}
+.hist-item:hover{border-color:var(--border2)}
+.hist-title{font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hist-meta{font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:2px}
 
-  .input-row {
-    display: flex;
-    gap: 12px;
-    max-width: 800px;
-  }
+.main{padding:24px 28px}
 
-  input[type="text"] {
-    flex: 1;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 14px 18px;
-    color: var(--text);
-    font-family: 'DM Mono', monospace;
-    font-size: 14px;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-  input[type="text"]:focus { border-color: var(--accent); }
-  input[type="text"]::placeholder { color: var(--muted); }
+.stats-banner{display:none;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
+.stats-banner.visible{display:grid}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px}
+.stat-label{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text3);margin-bottom:5px}
+.stat-value{font-size:20px;font-weight:700;letter-spacing:-0.5px}
+.stat-value.green{color:var(--accent)}.stat-value.blue{color:var(--accent3)}
 
-  .btn {
-    background: var(--accent);
-    color: #000;
-    border: none;
-    border-radius: 8px;
-    padding: 14px 28px;
-    font-family: 'Syne', sans-serif;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.15s;
-    white-space: nowrap;
-  }
-  .btn:hover { background: #d4ff3d; transform: translateY(-1px); }
-  .btn:active { transform: translateY(0); }
-  .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+.toolbar{display:none;align-items:center;justify-content:space-between;margin-bottom:16px}
+.toolbar.visible{display:flex}
+.toolbar-left,.toolbar-right{display:flex;align-items:center;gap:8px}
+.count-tag{font-family:var(--mono);font-size:12px;color:var(--text2)}
+.auto-btn{font-family:var(--mono);font-size:11px;padding:6px 12px;background:var(--accent-dim);border:1px solid rgba(184,255,87,0.25);border-radius:6px;color:var(--accent);cursor:pointer;transition:all 0.15s}
+.auto-btn:hover{background:rgba(184,255,87,0.2)}
+.icon-btn{width:30px;height:30px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:all 0.15s}
+.icon-btn:hover{border-color:var(--border2);color:var(--text)}
 
-  .btn-ghost {
-    background: transparent;
-    color: var(--text);
-    border: 1px solid var(--border);
-  }
-  .btn-ghost:hover { background: var(--surface2); border-color: var(--text); }
+.shorts-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:9px}
+.short-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:all 0.18s;position:relative}
+.short-card:hover{border-color:var(--border2);transform:translateY(-2px)}
+.short-card.selected{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.short-thumb{width:100%;aspect-ratio:9/16;object-fit:cover;display:block;background:var(--surface2)}
+.short-info{padding:9px 9px 11px}
+.short-title{font-size:12px;font-weight:500;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:5px}
+.short-meta{display:flex;align-items:center;justify-content:space-between}
+.short-views{font-family:var(--mono);font-size:11px}
+.short-views.viral{color:var(--accent)}.short-views.good{color:#8aff57}.short-views.avg{color:var(--text2)}.short-views.low{color:var(--accent2)}
+.viral-badge{font-family:var(--mono);font-size:9px;padding:2px 5px;border-radius:4px;font-weight:500}
+.viral-badge.viral{background:rgba(184,255,87,0.15);color:var(--accent)}.viral-badge.low{background:rgba(255,87,87,0.1);color:var(--accent2)}
+.select-num{position:absolute;top:7px;right:7px;width:20px;height:20px;background:var(--accent);color:#000;border-radius:50%;font-size:10px;font-weight:700;display:none;align-items:center;justify-content:center}
+.short-card.selected .select-num{display:flex}
+.dur-tag{position:absolute;top:7px;left:7px;background:rgba(0,0,0,0.7);color:#fff;font-family:var(--mono);font-size:9px;padding:2px 5px;border-radius:3px}
 
-  .btn-danger {
-    background: var(--red);
-    color: #fff;
-  }
-  .btn-danger:hover { background: #ff6666; }
+.load-more-btn{width:100%;margin-top:16px;padding:11px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text2);font-family:var(--mono);font-size:12px;cursor:pointer;transition:all 0.15s;display:none}
+.load-more-btn:hover{border-color:var(--border2);color:var(--text)}
+.load-more-btn.visible{display:block}
 
-  /* ── SHORTS GRID ── */
-  .section {
-    padding: 0 40px 40px;
-    max-width: 1400px;
-    margin: 0 auto;
-  }
+.analyze-bar{position:fixed;bottom:0;left:272px;right:0;background:rgba(17,17,17,0.97);backdrop-filter:blur(20px);border-top:1px solid var(--border);padding:13px 28px;display:flex;align-items:center;gap:12px;z-index:200;transform:translateY(100%);transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1)}
+.analyze-bar.visible{transform:translateY(0)}
+.analyze-sel{font-family:var(--mono);font-size:12px;color:var(--text2);flex:1}
+.analyze-sel strong{color:var(--text)}
+.frame-badge{font-family:var(--mono);font-size:10px;padding:4px 9px;border-radius:20px;border:1px solid;white-space:nowrap}
+.mode-sel{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:8px 10px;color:var(--text);font-family:var(--mono);font-size:11px;outline:none;cursor:pointer}
+.analyze-btn{background:var(--accent);color:#000;border:none;border-radius:7px;padding:10px 22px;font-family:var(--sans);font-size:13px;font-weight:700;cursor:pointer;transition:all 0.15s;white-space:nowrap}
+.analyze-btn:hover{background:#c8ff70}
+.analyze-btn:disabled{opacity:0.4;cursor:not-allowed}
 
-  .section-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 20px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid var(--border);
-  }
+.results-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.8);backdrop-filter:blur(4px);z-index:500;display:none;align-items:flex-end;justify-content:center}
+.results-overlay.visible{display:flex}
+.results-panel{background:var(--surface);border:1px solid var(--border);border-radius:16px 16px 0 0;width:100%;max-width:860px;max-height:85vh;overflow:hidden;display:flex;flex-direction:column;animation:slideUp 0.35s cubic-bezier(0.34,1.56,0.64,1)}
+@keyframes slideUp{from{transform:translateY(100%)}}
+.results-hdr{padding:18px 24px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0}
+.results-title{font-size:15px;font-weight:600;flex:1}
+.results-meta{font-family:var(--mono);font-size:10px;color:var(--text3)}
+.results-actions{display:flex;gap:6px}
+.results-body{padding:20px 24px 24px;overflow-y:auto;flex:1;line-height:1.75;font-size:14px;color:#ddd}
+.results-body h1{font-size:19px;color:var(--accent);margin:0 0 14px;letter-spacing:-0.5px}
+.results-body h2{font-size:15px;color:var(--text);margin:20px 0 8px;padding-bottom:7px;border-bottom:1px solid var(--border)}
+.results-body h3{font-size:13px;color:var(--accent3);margin:14px 0 6px}
+.results-body strong{color:var(--accent)}
+.results-body em{color:var(--text2)}
+.results-body ul,.results-body ol{padding-left:18px;margin:6px 0}
+.results-body li{margin:3px 0}
+.results-body table{width:100%;border-collapse:collapse;margin:14px 0;font-size:12px}
+.results-body th{background:var(--surface2);padding:9px 12px;text-align:left;border:1px solid var(--border);color:var(--accent);font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:0.5px}
+.results-body td{padding:9px 12px;border:1px solid var(--border)}
+.results-body tr:nth-child(even) td{background:rgba(255,255,255,0.02)}
+.results-body code{font-family:var(--mono);font-size:11px;background:var(--surface2);padding:2px 5px;border-radius:3px;color:var(--accent3)}
+.results-body blockquote{border-left:3px solid var(--accent);padding-left:14px;margin:10px 0;color:var(--text2)}
+.results-body hr{border:none;border-top:1px solid var(--border);margin:18px 0}
 
-  .section-title {
-    font-size: 13px;
-    font-family: 'DM Mono', monospace;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
+.loading-overlay{position:fixed;inset:0;background:rgba(8,8,8,0.93);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:1000;gap:18px}
+.loading-overlay.visible{display:flex}
+.loading-ring{width:40px;height:40px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-family:var(--mono);font-size:13px;color:var(--text2)}
+.loading-status{font-family:var(--mono);font-size:11px;color:var(--accent)}
 
-  .count-badge {
-    font-family: 'DM Mono', monospace;
-    font-size: 12px;
-    color: var(--accent);
-    background: rgba(200, 241, 53, 0.1);
-    padding: 4px 10px;
-    border-radius: 20px;
-  }
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:55vh;gap:10px;color:var(--text3);font-family:var(--mono);font-size:13px;text-align:center}
+.empty-icon{font-size:38px;margin-bottom:6px}
 
-  .shorts-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 12px;
-  }
+.toast{position:fixed;bottom:76px;right:20px;background:var(--surface2);border:1px solid var(--border2);border-radius:7px;padding:9px 14px;font-family:var(--mono);font-size:12px;z-index:2000;transform:translateY(8px);opacity:0;transition:all 0.2s;pointer-events:none}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{border-color:var(--accent);color:var(--accent)}
+.toast.error{border-color:var(--accent2);color:var(--accent2)}
 
-  .short-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    overflow: hidden;
-    cursor: pointer;
-    transition: all 0.2s;
-    position: relative;
-  }
-  .short-card:hover { border-color: #444; transform: translateY(-2px); }
-  .short-card.selected {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 1px var(--accent);
-  }
-
-  .short-thumb {
-    width: 100%;
-    aspect-ratio: 9/16;
-    object-fit: cover;
-    display: block;
-    background: var(--surface2);
-  }
-
-  .short-info {
-    padding: 12px;
-  }
-
-  .short-title {
-    font-size: 13px;
-    font-weight: 600;
-    line-height: 1.3;
-    margin-bottom: 6px;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  .short-views {
-    font-family: 'DM Mono', monospace;
-    font-size: 12px;
-    color: var(--muted);
-  }
-
-  .short-views.high { color: var(--accent); }
-  .short-views.low { color: var(--red); }
-
-  .select-indicator {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    background: var(--accent);
-    color: #000;
-    font-size: 12px;
-    font-weight: 800;
-    display: none;
-    align-items: center;
-    justify-content: center;
-  }
-  .short-card.selected .select-indicator { display: flex; }
-
-  /* ── ANALYSIS PANEL ── */
-  .analyze-bar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: var(--surface);
-    border-top: 1px solid var(--border);
-    padding: 16px 40px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    z-index: 200;
-    transform: translateY(100%);
-    transition: transform 0.3s ease;
-  }
-  .analyze-bar.visible { transform: translateY(0); }
-
-  .analyze-bar .selection-info {
-    font-family: 'DM Mono', monospace;
-    font-size: 13px;
-    color: var(--muted);
-    flex: 1;
-  }
-  .analyze-bar .selection-info strong { color: var(--text); }
-
-  .mode-select {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 10px 14px;
-    color: var(--text);
-    font-family: 'DM Mono', monospace;
-    font-size: 13px;
-    outline: none;
-    cursor: pointer;
-  }
-
-  /* ── RESULTS ── */
-  .results-panel {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 32px;
-    margin: 0 40px 120px;
-    max-width: 1320px;
-    margin-left: auto;
-    margin-right: auto;
-    display: none;
-  }
-  .results-panel.visible { display: block; }
-
-  .results-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 24px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .results-title {
-    font-size: 18px;
-    font-weight: 700;
-  }
-
-  .results-body {
-    font-family: 'DM Mono', monospace;
-    font-size: 14px;
-    line-height: 1.8;
-    color: #ddd;
-    white-space: pre-wrap;
-  }
-
-  .results-body h1, .results-body h2, .results-body h3 {
-    font-family: 'Syne', sans-serif;
-    color: var(--text);
-    margin: 24px 0 12px;
-  }
-  .results-body h1 { font-size: 22px; color: var(--accent); }
-  .results-body h2 { font-size: 18px; }
-  .results-body h3 { font-size: 15px; color: var(--accent2); }
-  .results-body strong { color: var(--accent); }
-  .results-body table {
-    border-collapse: collapse;
-    width: 100%;
-    margin: 16px 0;
-    font-size: 13px;
-  }
-  .results-body th {
-    background: var(--surface2);
-    padding: 10px 14px;
-    text-align: left;
-    border: 1px solid var(--border);
-    color: var(--accent);
-  }
-  .results-body td {
-    padding: 10px 14px;
-    border: 1px solid var(--border);
-  }
-  .results-body tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
-
-  /* ── LOADING ── */
-  .loading-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(10,10,10,0.9);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 500;
-    flex-direction: column;
-    gap: 20px;
-  }
-  .loading-overlay.visible { display: flex; }
-
-  .loading-spinner {
-    width: 48px;
-    height: 48px;
-    border: 3px solid var(--border);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  .loading-text {
-    font-family: 'DM Mono', monospace;
-    font-size: 14px;
-    color: var(--muted);
-  }
-  .loading-status {
-    font-family: 'DM Mono', monospace;
-    font-size: 12px;
-    color: var(--accent);
-  }
-
-  /* ── EMPTY STATE ── */
-  .empty {
-    text-align: center;
-    padding: 80px 20px;
-    color: var(--muted);
-    font-family: 'DM Mono', monospace;
-    font-size: 13px;
-  }
-  .empty-icon { font-size: 48px; margin-bottom: 16px; }
-
-  /* ── TOAST ── */
-  .toast {
-    position: fixed;
-    bottom: 80px;
-    right: 40px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 12px 18px;
-    font-family: 'DM Mono', monospace;
-    font-size: 13px;
-    z-index: 1000;
-    transform: translateY(20px);
-    opacity: 0;
-    transition: all 0.3s;
-  }
-  .toast.show { transform: translateY(0); opacity: 1; }
-  .toast.error { border-color: var(--red); color: var(--red); }
-  .toast.success { border-color: var(--accent); color: var(--accent); }
-
-  /* ── UTILS ── */
-  .hidden { display: none; }
-  .flex { display: flex; }
-  .gap-8 { gap: 8px; }
+@media(max-width:768px){
+  .layout{grid-template-columns:1fr}
+  .sidebar{position:static;height:auto;border-right:none;border-bottom:1px solid var(--border)}
+  .analyze-bar{left:0}
+  .stats-banner{grid-template-columns:repeat(2,1fr)}
+  .main{padding:16px}
+}
 </style>
 </head>
 <body>
-
-<header>
-  <div class="logo">Shorts<span>IQ</span></div>
-  <div class="badge">BETA</div>
+  <header>
+  <div class="logo"><div class="logo-dot"></div>Shorts<span>IQ</span><span style="font-size:11px;font-weight:400;color:var(--text3);margin-left:4px;font-family:var(--mono)">by Gearshift Media</span></div>
+  <div class="header-right">
+    <div class="pill" id="channelPill" style="display:none"></div>
+    <div class="pill">BETA</div>
+  </div>
 </header>
 
-<div class="hero">
-  <h1>Decode what makes<br>Shorts <em>go viral.</em></h1>
-  <p>// paste any youtube channel → analyze shorts → find the pattern</p>
-  <div class="input-row">
-    <input type="text" id="channelInput" placeholder="https://www.youtube.com/@channel" />
-    <select class="mode-select" id="limitSelect" style="min-width:120px">
-      <option value="10">10 shorts</option>
-      <option value="20">20 shorts</option>
-      <option value="30" selected>30 shorts</option>
-      <option value="50">50 shorts</option>
-    </select>
-    <button class="btn" id="fetchBtn" onclick="fetchShorts()">Fetch Shorts</button>
+<div class="layout">
+<aside class="sidebar">
+  <div>
+    <div class="sec-label">Channel</div>
+    <input type="text" class="channel-input" id="channelInput" placeholder="@channel or full URL" />
+    <div class="input-row">
+      <select class="limit-sel" id="limitSelect">
+        <option value="10">10 shorts</option>
+        <option value="20">20 shorts</option>
+        <option value="30" selected>30 shorts</option>
+        <option value="50">50 shorts</option>
+      </select>
+      <button class="fetch-btn" id="fetchBtn" onclick="fetchShorts()">Fetch</button>
+    </div>
+    <button class="save-btn" id="saveBtn" onclick="saveChannel()" style="display:none">+ Save Channel</button>
   </div>
-</div>
 
-<!-- Shorts Grid -->
-<div class="section" id="shortsSection" style="display:none">
-  <div class="section-header">
-    <span class="section-title">Shorts</span>
-    <div class="flex gap-8" style="align-items:center">
-      <span class="count-badge" id="countBadge"></span>
-      <button class="btn btn-ghost" style="padding:8px 16px;font-size:13px" onclick="selectAll()">Select All</button>
-      <button class="btn btn-ghost" style="padding:8px 16px;font-size:13px" onclick="clearSelection()">Clear</button>
+  <div id="savedSection" style="display:none">
+    <div class="sec-label">Saved</div>
+    <div class="saved-channels" id="savedChannels"></div>
+  </div>
+
+  <div id="filterSection" style="display:none">
+    <div class="sec-label">Sort & Filter</div>
+    <div class="filter-group">
+      <input type="text" class="search-input" id="searchInput" placeholder="Search titles..." oninput="filterShorts()" />
+      <div class="filter-row">
+        <button class="filter-btn active" onclick="sortShorts('default',this)">Default</button>
+        <button class="filter-btn" onclick="sortShorts('views-desc',this)">Top</button>
+        <button class="filter-btn" onclick="sortShorts('views-asc',this)">Low</button>
+      </div>
+      <div class="filter-row">
+        <button class="filter-btn" onclick="sortShorts('dur-asc',this)">Shortest</button>
+        <button class="filter-btn" onclick="sortShorts('dur-desc',this)">Longest</button>
+      </div>
     </div>
   </div>
-  <div class="shorts-grid" id="shortsGrid"></div>
-</div>
 
-<!-- Results -->
-<div class="results-panel" id="resultsPanel">
-  <div class="results-header">
-    <span style="font-size:20px">🔬</span>
-    <div class="results-title">Analysis</div>
-    <button class="btn btn-ghost" style="margin-left:auto;padding:8px 16px;font-size:13px" onclick="closeResults()">Close</button>
+  <div id="historySection" style="display:none">
+    <div class="sec-label">Recent Analyses</div>
+    <div class="history-list" id="historyList"></div>
   </div>
-  <div class="results-body" id="resultsBody"></div>
+</aside>
+
+<main class="main">
+  <div class="stats-banner" id="statsBanner">
+    <div class="stat-card"><div class="stat-label">Total Shorts</div><div class="stat-value" id="statTotal">—</div></div>
+    <div class="stat-card"><div class="stat-label">Total Views</div><div class="stat-value green" id="statTotalViews">—</div></div>
+    <div class="stat-card"><div class="stat-label">Avg Views</div><div class="stat-value blue" id="statAvgViews">—</div></div>
+    <div class="stat-card"><div class="stat-label">Top Short</div><div class="stat-value" id="statTop">—</div></div>
+  </div>
+
+  <div class="toolbar" id="toolbar">
+    <div class="toolbar-left">
+      <div class="count-tag" id="countTag"></div>
+      <button class="auto-btn" onclick="autoSelect()">⚡ Auto-select best + worst</button>
+    </div>
+    <div class="toolbar-right">
+      <button class="icon-btn" onclick="selectAll()" title="Select all">☑</button>
+      <button class="icon-btn" onclick="clearSelection()" title="Clear">✕</button>
+    </div>
+  </div>
+
+  <div class="shorts-grid" id="shortsGrid">
+    <div class="empty-state" style="grid-column:1/-1">
+      <div class="empty-icon">📡</div>
+      <div>Paste a YouTube channel to get started</div>
+      <div style="color:var(--text3);font-size:11px;margin-top:4px">e.g. @southfloridapokemon</div>
+    </div>
+  </div>
+  <button class="load-more-btn" id="loadMoreBtn" onclick="loadMore()">Load 20 more shorts</button>
+</main>
 </div>
 
-<!-- Analyze Bar -->
 <div class="analyze-bar" id="analyzeBar">
-  <div class="selection-info">
-    <strong id="selectedCount">0</strong> videos selected
-  </div>
-  <select class="mode-select" id="modeSelect">
+  <div class="analyze-sel"><strong id="selCount">0</strong> videos selected</div>
+  <div class="frame-badge" id="frameBadge"></div>
+  <select class="mode-sel" id="modeSelect">
     <option value="compare">Compare best vs worst</option>
-    <option value="single">Single video analysis</option>
+    <option value="single">Single video deep dive</option>
     <option value="retention">Retention audit</option>
   </select>
-  <button class="btn" id="analyzeBtn" onclick="analyzeSelected()">Analyze with Claude</button>
+  <button class="analyze-btn" id="analyzeBtn" onclick="analyze()">Analyze with Claude →</button>
 </div>
 
-<!-- Loading -->
+<div class="results-overlay" id="resultsOverlay" onclick="closeResults(event)">
+  <div class="results-panel" onclick="event.stopPropagation()">
+    <div class="results-hdr">
+      <div style="font-size:18px">🔬</div>
+      <div class="results-title" id="resultsTitle">Analysis</div>
+      <div class="results-meta" id="resultsMeta"></div>
+      <div class="results-actions">
+        <button class="icon-btn" onclick="copyResults()" title="Copy to clipboard">📋</button>
+        <button class="icon-btn" onclick="exportPDF()" title="Export PDF">📄</button>
+        <button class="icon-btn" onclick="closeResults()" title="Close">✕</button>
+      </div>
+    </div>
+    <div class="results-body" id="resultsBody"></div>
+  </div>
+</div>
+
 <div class="loading-overlay" id="loadingOverlay">
-  <div class="loading-spinner"></div>
-  <div class="loading-text" id="loadingText">Fetching data...</div>
+  <div class="loading-ring"></div>
+  <div class="loading-text" id="loadingText">Working...</div>
   <div class="loading-status" id="loadingStatus"></div>
 </div>
 
-<!-- Toast -->
 <div class="toast" id="toast"></div>
 
 <script>
-  let allShorts = [];
-  let selected = new Set();
+let allShorts=[],filteredShorts=[],selected=new Set(),currentChannel='',avgViews=0,currentSort='default';
+let analysisHistory=JSON.parse(localStorage.getItem('shortsiq_history')||'[]');
+let savedChannels=JSON.parse(localStorage.getItem('shortsiq_channels')||'[]');
 
-  // ── FETCH SHORTS ─────────────────────────────────────────────────────────
-  async function fetchShorts() {
-    const url = document.getElementById('channelInput').value.trim();
-    if (!url) { showToast('Paste a YouTube channel URL first', 'error'); return; }
+document.addEventListener('DOMContentLoaded',()=>{
+  renderSavedChannels();renderHistory();
+  document.getElementById('channelInput').addEventListener('keydown',e=>{if(e.key==='Enter')fetchShorts();});
+});
 
-    const limit = document.getElementById('limitSelect').value;
-    setLoading(true, 'Fetching shorts list...', 'Running yt-dlp...');
-    document.getElementById('fetchBtn').disabled = true;
+async function fetchShorts(){
+  const raw=document.getElementById('channelInput').value.trim();
+  if(!raw){showToast('Enter a channel URL or @handle','error');return;}
+  const url=raw.startsWith('http')?raw:`https://www.youtube.com/${raw.startsWith('@')?raw:'@'+raw}`;
+  currentChannel=raw;
+  const limit=document.getElementById('limitSelect').value;
+  setLoading(true,'Fetching Shorts list...','Running yt-dlp...');
+  document.getElementById('fetchBtn').disabled=true;
+  try{
+    const res=await fetch('/api/shorts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({channel_url:url,limit})});
+    const data=await res.json();
+    if(data.error)throw new Error(data.error);
+    allShorts=data.shorts;filteredShorts=[...allShorts];selected.clear();
+    renderStats();renderGrid();showUI();
+    showToast(`${data.count} Shorts loaded`,'success');
+  }catch(e){showToast(e.message,'error');}
+  finally{setLoading(false);document.getElementById('fetchBtn').disabled=false;}
+}
 
-    try {
-      const res = await fetch('/api/shorts', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ channel_url: url, limit })
-      });
-      const data = await res.json();
-      if (data.error) throw new Error(data.error);
+function renderStats(){
+  const totalViews=allShorts.reduce((s,v)=>s+(v.views||0),0);
+  avgViews=totalViews/allShorts.length;
+  const topViews=Math.max(...allShorts.map(s=>s.views||0));
+  document.getElementById('statTotal').textContent=allShorts.length;
+  document.getElementById('statTotalViews').textContent=fmtViews(totalViews);
+  document.getElementById('statAvgViews').textContent=fmtViews(avgViews);
+  document.getElementById('statTop').textContent=fmtViews(topViews);
+  document.getElementById('statsBanner').classList.add('visible');
+  document.getElementById('channelPill').textContent=currentChannel;
+  document.getElementById('channelPill').style.display='block';
+  document.getElementById('saveBtn').style.display='block';
+}
 
-      allShorts = data.shorts;
-      selected.clear();
-      renderShorts();
-      document.getElementById('shortsSection').style.display = 'block';
-      document.getElementById('countBadge').textContent = `${data.count} found`;
-      showToast(`${data.count} Shorts loaded`, 'success');
-    } catch (e) {
-      showToast(e.message, 'error');
-    } finally {
-      setLoading(false);
-      document.getElementById('fetchBtn').disabled = false;
-    }
+function renderGrid(){
+  const grid=document.getElementById('shortsGrid');
+  if(!filteredShorts.length){grid.innerHTML='<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">🔍</div><div>No Shorts match</div></div>';return;}
+  grid.innerHTML=filteredShorts.map(s=>{
+    const ratio=avgViews>0?s.views/avgViews:1;
+    const vc=ratio>=3?'viral':ratio>=1.2?'good':ratio>=0.5?'avg':'low';
+    const badge=ratio>=3?'<div class="viral-badge viral">viral</div>':ratio<0.4?'<div class="viral-badge low">low</div>':'';
+    const dur=s.duration?`<div class="dur-tag">${s.duration}s</div>`:'';
+    const isSel=selected.has(s.id);
+    const selIdx=isSel?[...selected].indexOf(s.id)+1:'';
+    const thumb=s.thumbnail||`https://img.youtube.com/vi/${s.id}/hqdefault.jpg`;
+    return `<div class="short-card ${isSel?'selected':''}" onclick="toggleSelect('${s.id}')" data-id="${s.id}">
+      <div class="select-num">${selIdx}</div>${dur}
+      <img class="short-thumb" src="${thumb}" loading="lazy" onerror="this.src='https://img.youtube.com/vi/${s.id}/hqdefault.jpg'">
+      <div class="short-info">
+        <div class="short-title">${s.title}</div>
+        <div class="short-meta"><div class="short-views ${vc}">${fmtViews(s.views)}</div>${badge}</div>
+      </div></div>`;
+  }).join('');
+  document.getElementById('countTag').textContent=`${filteredShorts.length} shorts`;
+}
+
+function toggleSelect(id){selected.has(id)?selected.delete(id):selected.add(id);renderGrid();updateBar();}
+function selectAll(){filteredShorts.forEach(s=>selected.add(s.id));renderGrid();updateBar();}
+function clearSelection(){selected.clear();renderGrid();updateBar();}
+function autoSelect(){
+  selected.clear();
+  const sorted=[...allShorts].sort((a,b)=>(b.views||0)-(a.views||0));
+  [...sorted.slice(0,2),...sorted.slice(-2)].forEach(s=>selected.add(s.id));
+  renderGrid();updateBar();showToast('Selected 2 best + 2 worst','success');
+}
+
+function updateBar(){
+  const count=selected.size;
+  document.getElementById('selCount').textContent=count;
+  document.getElementById('analyzeBar').classList.toggle('visible',count>0);
+  const LIMIT=90,hookPer=Math.min(30,Math.max(6,Math.floor(LIMIT*0.7/Math.max(count,1))));
+  const midPer=Math.max(0,Math.floor((LIMIT-hookPer*count)/Math.max(count,1)));
+  const badge=document.getElementById('frameBadge');
+  let label,color,bg;
+  if(count<=2){label='ULTRA';color='#b8ff57';bg='rgba(184,255,87,0.12)';}
+  else if(count<=4){label='HIGH';color='#ffa500';bg='rgba(255,165,0,0.12)';}
+  else if(count<=7){label='MEDIUM';color='#ff8c00';bg='rgba(255,140,0,0.1)';}
+  else{label='MINIMAL';color='#ff5757';bg='rgba(255,87,87,0.1)';}
+  badge.textContent=`${hookPer} hook + ${midPer} mid · ${label}`;
+  badge.style.cssText=`background:${bg};color:${color};border-color:${color}`;
+}
+
+function sortShorts(type,btn){
+  currentSort=type;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');applyFilters();
+}
+function filterShorts(){applyFilters();}
+function applyFilters(){
+  const q=document.getElementById('searchInput').value.toLowerCase();
+  let r=allShorts.filter(s=>!q||s.title.toLowerCase().includes(q));
+  if(currentSort==='views-desc')r.sort((a,b)=>(b.views||0)-(a.views||0));
+  else if(currentSort==='views-asc')r.sort((a,b)=>(a.views||0)-(b.views||0));
+  else if(currentSort==='dur-asc')r.sort((a,b)=>(a.duration||0)-(b.duration||0));
+  else if(currentSort==='dur-desc')r.sort((a,b)=>(b.duration||0)-(a.duration||0));
+  filteredShorts=r;renderGrid();
+}
+
+async function analyze(){
+  if(!selected.size)return;
+  const mode=document.getElementById('modeSelect').value;
+  const ids=[...selected];
+  const titlesMap={},viewsMap={};
+  allShorts.forEach(s=>{titlesMap[s.id]=s.title;viewsMap[s.id]=s.views;});
+  setLoading(true,`Analyzing ${ids.length} video(s)...`,'Downloading frames + transcripts — 1-3 min');
+  try{
+    const res=await fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({video_ids:ids,titles:titlesMap,views:viewsMap,mode})});
+    const data=await res.json();
+    if(data.error)throw new Error(data.error);
+    showResults(data.analysis,data.frame_note,ids.length,mode);
+    saveToHistory(data.analysis,ids.map(id=>titlesMap[id]),mode);
+  }catch(e){showToast(e.message,'error');}
+  finally{setLoading(false);}
+}
+
+let currentResults='';
+function showResults(markdown,frameNote,count,mode){
+  currentResults=markdown;
+  document.getElementById('resultsTitle').textContent=mode==='compare'?'Viral Analysis':mode==='retention'?'Retention Audit':'Deep Dive';
+  document.getElementById('resultsMeta').textContent=`${count} video${count>1?'s':''} · ${frameNote||''}`;
+  document.getElementById('resultsBody').innerHTML=parseMd(markdown);
+  document.getElementById('resultsOverlay').classList.add('visible');
+}
+function closeResults(e){if(!e||e.target===document.getElementById('resultsOverlay'))document.getElementById('resultsOverlay').classList.remove('visible');}
+function copyResults(){navigator.clipboard.writeText(currentResults).then(()=>showToast('Copied','success'));}
+function parseMd(t){
+  t = t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  t = t.replace(/^### (.+)$/gm,'<h3>$1</h3>');
+  t = t.replace(/^## (.+)$/gm,'<h2>$1</h2>');
+  t = t.replace(/^# (.+)$/gm,'<h1>$1</h1>');
+  t = t.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+  t = t.replace(/\*(.+?)\*/g,'<em>$1</em>');
+  t = t.replace(/`(.+?)`/g,'<code>$1</code>');
+  t = t.replace(/^---$/gm,'<hr>');
+  t = t.replace(/^&gt; (.+)$/gm,'<blockquote>$1</blockquote>');
+  t = t.replace(/^[\-\*] (.+)$/gm,'<li>$1</li>');
+  t = t.replace(/\n\n/g,'<br><br>');
+  return t;
+}
+
+function saveToHistory(analysis,titles,mode){
+  const item={id:Date.now(),mode,titles:titles.slice(0,2).join(', '),channel:currentChannel,analysis,date:new Date().toLocaleDateString()};
+  analysisHistory.unshift(item);analysisHistory=analysisHistory.slice(0,10);
+  localStorage.setItem('shortsiq_history',JSON.stringify(analysisHistory));renderHistory();
+}
+function renderHistory(){
+  const list=document.getElementById('historyList'),section=document.getElementById('historySection');
+  if(!analysisHistory.length){section.style.display='none';return;}
+  section.style.display='block';
+  list.innerHTML=analysisHistory.map(item=>`<div class="hist-item" onclick="loadHistory(${item.id})"><div class="hist-title">${item.titles||'Analysis'}</div><div class="hist-meta">${item.mode} · ${item.date}</div></div>`).join('');
+}
+function loadHistory(id){const item=analysisHistory.find(h=>h.id===id);if(item)showResults(item.analysis,'',0,item.mode);}
+
+function saveChannel(){
+  if(!currentChannel||savedChannels.includes(currentChannel))return;
+  savedChannels.push(currentChannel);localStorage.setItem('shortsiq_channels',JSON.stringify(savedChannels));
+  renderSavedChannels();showToast('Channel saved','success');
+}
+function renderSavedChannels(){
+  const el=document.getElementById('savedChannels'),section=document.getElementById('savedSection');
+  if(!savedChannels.length){section.style.display='none';return;}
+  section.style.display='block';
+  el.innerHTML=savedChannels.map((ch,i)=>`<div class="saved-ch" onclick="loadSaved('${ch}')"><div>${ch}</div><div class="saved-ch-rm" onclick="event.stopPropagation();removeCh(${i})">×</div></div>`).join('');
+}
+function loadSaved(ch){document.getElementById('channelInput').value=ch;fetchShorts();}
+function removeCh(i){savedChannels.splice(i,1);localStorage.setItem('shortsiq_channels',JSON.stringify(savedChannels));renderSavedChannels();}
+
+async function loadMore(){
+  const url=document.getElementById('channelInput').value.trim();
+  const newLimit=allShorts.length+20;
+  setLoading(true,'Loading more...','');
+  try{
+    const res=await fetch('/api/shorts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({channel_url:url,limit:newLimit})});
+    const data=await res.json();
+    allShorts=data.shorts;filteredShorts=[...allShorts];renderStats();renderGrid();
+    showToast(`${data.count} Shorts loaded`,'success');
+  }catch(e){showToast(e.message,'error');}
+  finally{setLoading(false);}
+}
+
+function showUI(){
+  document.getElementById('toolbar').classList.add('visible');
+  document.getElementById('filterSection').style.display='block';
+  document.getElementById('loadMoreBtn').classList.add('visible');
+}
+function setLoading(show,text='',status=''){
+  document.getElementById('loadingOverlay').classList.toggle('visible',show);
+  document.getElementById('loadingText').textContent=text;
+  document.getElementById('loadingStatus').textContent=status;
+}
+function fmtViews(n){if(!n&&n!==0)return '—';if(n>=1000000)return(n/1000000).toFixed(1)+'M';if(n>=1000)return(n/1000).toFixed(0)+'K';return n.toString();}
+
+async function exportPDF() {
+  const title = document.getElementById('resultsTitle').textContent;
+  const meta = document.getElementById('resultsMeta').textContent;
+  const body = document.getElementById('resultsBody').innerHTML;
+  const channel = currentChannel || 'Unknown Channel';
+  const date = new Date().toLocaleDateString('en-US', {year:'numeric',month:'long',day:'numeric'});
+
+  const styles = [
+    "body{font-family:'Space Grotesk',sans-serif;max-width:800px;margin:0 auto;padding:48px 40px;color:#1a1a1a;line-height:1.7}",
+    ".header{border-bottom:3px solid #b8ff57;padding-bottom:20px;margin-bottom:32px}",
+    ".brand{font-size:13px;font-family:monospace;color:#666;margin-bottom:8px}",
+    ".report-title{font-size:28px;font-weight:700;letter-spacing:-0.5px;margin:0 0 6px}",
+    ".report-meta{font-family:monospace;font-size:12px;color:#888}",
+    "h1{font-size:20px;color:#1a1a1a;border-left:4px solid #b8ff57;padding-left:12px;margin:28px 0 12px}",
+    "h2{font-size:16px;font-weight:600;margin:24px 0 8px;border-bottom:1px solid #eee;padding-bottom:6px}",
+    "h3{font-size:14px;color:#444;margin:16px 0 6px}",
+    "strong{color:#000}",
+    "table{width:100%;border-collapse:collapse;margin:16px 0;font-size:13px}",
+    "th{background:#f5f5f5;padding:10px 12px;text-align:left;border:1px solid #ddd}",
+    "td{padding:10px 12px;border:1px solid #ddd}",
+    "tr:nth-child(even) td{background:#fafafa}",
+    "ul,ol{padding-left:20px}",
+    "li{margin:4px 0}",
+    "blockquote{border-left:3px solid #b8ff57;padding-left:14px;margin:12px 0;color:#555}",
+    "hr{border:none;border-top:1px solid #eee;margin:20px 0}",
+    ".footer{margin-top:48px;padding-top:16px;border-top:1px solid #eee;font-family:monospace;font-size:11px;color:#aaa;display:flex;justify-content:space-between}"
+  ].join('\n');
+
+  const htmlContent = '<html><head><meta charset="UTF-8"><title>' + title + ' - ShortsIQ</title><style>' + styles + '</style></head><body>'
+    + '<div class="header"><div class="brand">SHORTSIQ by Gearshift Media</div>'
+    + '<div class="report-title">' + title + '</div>'
+    + '<div class="report-meta">Channel: ' + channel + ' · ' + meta + ' · Generated ' + date + '</div></div>'
+    + body
+    + '<div class="footer"><span>ShortsIQ by Gearshift Media</span><span>app.shortsiq.app</span></div>'
+    + '</body></html>';
+
+  const blob = new Blob([htmlContent], {type: 'text/html'});
+  const url = URL.createObjectURL(blob);
+  const win = window.open(url, '_blank');
+  if (win) {
+    win.onload = () => { setTimeout(() => { win.print(); }, 500); };
   }
+  showToast('Opening print dialog — save as PDF', 'success');
+}
 
-  // ── RENDER SHORTS ─────────────────────────────────────────────────────────
-  function renderShorts() {
-    const grid = document.getElementById('shortsGrid');
-    if (!allShorts.length) {
-      grid.innerHTML = '<div class="empty"><div class="empty-icon">📭</div>No shorts found</div>';
-      return;
-    }
-
-    const maxViews = Math.max(...allShorts.map(s => s.views));
-    const minViews = Math.min(...allShorts.map(s => s.views));
-
-    grid.innerHTML = allShorts.map((s, i) => {
-      const viewClass = s.views === maxViews ? 'high' : s.views === minViews ? 'low' : '';
-      const viewStr = formatViews(s.views);
-      const thumb = s.thumbnail || `https://img.youtube.com/vi/${s.id}/hqdefault.jpg`;
-      const isSelected = selected.has(s.id);
-      return `
-        <div class="short-card ${isSelected ? 'selected' : ''}" onclick="toggleSelect('${s.id}')" data-id="${s.id}">
-          <div class="select-indicator">${getSelectionIndex(s.id)}</div>
-          <img class="short-thumb" src="${thumb}" alt="${s.title}" loading="lazy"
-               onerror="this.src='https://img.youtube.com/vi/${s.id}/hqdefault.jpg'">
-          <div class="short-info">
-            <div class="short-title">${s.title}</div>
-            <div class="short-views ${viewClass}">${viewStr} views</div>
-          </div>
-        </div>
-      `;
-    }).join('');
-  }
-
-  function getSelectionIndex(id) {
-    const arr = [...selected];
-    const idx = arr.indexOf(id);
-    return idx >= 0 ? idx + 1 : '';
-  }
-
-  function toggleSelect(id) {
-    if (selected.has(id)) {
-      selected.delete(id);
-    } else {
-      selected.add(id);
-    }
-    renderShorts();
-    updateAnalyzeBar();
-  }
-
-  function selectAll() {
-    allShorts.forEach(s => selected.add(s.id));
-    renderShorts();
-    updateAnalyzeBar();
-  }
-
-  function clearSelection() {
-    selected.clear();
-    renderShorts();
-    updateAnalyzeBar();
-  }
-
-  function updateAnalyzeBar() {
-    const bar = document.getElementById('analyzeBar');
-    const count = selected.size;
-    document.getElementById('selectedCount').textContent = count;
-    bar.classList.toggle('visible', count > 0);
-
-    // Frame quality indicator — mirrors backend logic
-    const badge = document.getElementById('frameBadge');
-    const LIMIT = 98;
-    const idealHook = 30;
-    let hookPer, midtailPer, label, color, bg;
-
-    if (idealHook * count <= LIMIT * 0.7) {
-      hookPer = idealHook;
-    } else {
-      hookPer = Math.max(6, Math.floor(LIMIT * 0.7 / count));
-    }
-    midtailPer = Math.max(0, Math.floor((LIMIT - hookPer * count) / count));
-
-    if (count <= 2) {
-      label = 'ULTRA'; color = '#c8f135'; bg = 'rgba(200,241,53,0.15)';
-    } else if (count <= 4) {
-      label = 'HIGH'; color = '#ffa500'; bg = 'rgba(255,165,0,0.15)';
-    } else if (count <= 7) {
-      label = 'MEDIUM'; color = '#ff8c00'; bg = 'rgba(255,165,0,0.1)';
-    } else {
-      label = 'MINIMAL'; color = '#ff4444'; bg = 'rgba(255,68,68,0.1)';
-    }
-
-    badge.textContent = hookPer + ' hook + ' + midtailPer + ' mid/tail · ' + label;
-    badge.style.background = bg;
-    badge.style.color = color;
-    badge.style.borderColor = color;
-  }
-
-  // ── ANALYZE ───────────────────────────────────────────────────────────────
-  async function analyzeSelected() {
-    if (!selected.size) return;
-    const mode = document.getElementById('modeSelect').value;
-    const videoIds = [...selected];
-    const titlesMap = {};
-    const viewsMap = {};
-    allShorts.forEach(s => {
-      titlesMap[s.id] = s.title;
-      viewsMap[s.id] = s.views;
-    });
-
-    setLoading(true, 'Scraping video frames & transcripts...', `Processing ${videoIds.length} video(s) — this takes 1-2 min`);
-
-    try {
-      const res = await fetch('/api/analyze', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
-          video_ids: videoIds,
-          titles: titlesMap,
-          views: viewsMap,
-          mode
-        })
-      });
-      const data = await res.json();
-      if (data.error) throw new Error(data.error);
-      showResults(data.analysis, data.frame_note, data.frames_per_video);
-    } catch (e) {
-      showToast(e.message, 'error');
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  function showResults(markdown, frameNote, framesPerVideo) {
-    const panel = document.getElementById('resultsPanel');
-    const body = document.getElementById('resultsBody');
-    const title = document.querySelector('.results-title');
-    if (frameNote) {
-      title.innerHTML = `Analysis <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);font-weight:400;margin-left:8px">${frameNote}</span>`;
-    }
-    body.innerHTML = renderMarkdown(markdown);
-    panel.classList.add('visible');
-    panel.scrollIntoView({ behavior: 'smooth' });
-  }
-
-  function closeResults() {
-    document.getElementById('resultsPanel').classList.remove('visible');
-  }
-
-  // ── MARKDOWN RENDERER ─────────────────────────────────────────────────────
-  function renderMarkdown(text) {
-    return text
-      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-      .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-      .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-      .replace(/^# (.+)$/gm, '<h1>$1</h1>')
-      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*(.+?)\*/g, '<em>$1</em>')
-      .replace(/^- (.+)$/gm, '<li>$1</li>')
-      .replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>')
-      .replace(/\n\n/g, '<br><br>')
-      .replace(/\n/g, '\n');
-  }
-
-  // ── UTILS ─────────────────────────────────────────────────────────────────
-  function formatViews(n) {
-    if (!n) return '—';
-    if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
-    if (n >= 1000) return (n / 1000).toFixed(0) + 'K';
-    return n.toString();
-  }
-
-  function setLoading(show, text = '', status = '') {
-    const overlay = document.getElementById('loadingOverlay');
-    overlay.classList.toggle('visible', show);
-    document.getElementById('loadingText').textContent = text;
-    document.getElementById('loadingStatus').textContent = status;
-  }
-
-  function showToast(msg, type = '') {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.className = `toast ${type} show`;
-    setTimeout(() => { t.className = 'toast'; }, 3000);
-  }
-
-  // Enter key on input
-  document.getElementById('channelInput').addEventListener('keydown', e => {
-    if (e.key === 'Enter') fetchShorts();
-  });
+function showToast(msg,type=''){
+  const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;
+  setTimeout(()=>t.className='toast',3000);
+}
 </script>
 </body>
 </html>
