@@ -336,6 +336,9 @@ header{position:sticky;top:0;z-index:100;background:rgba(8,8,8,0.95);backdrop-fi
     </div>
     <div class="results-body" id="resultsBody" style="padding-bottom:20px"></div>
     <div class="chat-section" id="chatSection">
+      <div id="chatResizeHandle" style="height:6px;cursor:ns-resize;background:transparent;border-top:2px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0" title="Drag to resize">
+        <div style="width:32px;height:2px;background:var(--border2);border-radius:2px"></div>
+      </div>
       <div class="chat-messages" id="chatMessages"></div>
       <div class="chat-input-row">
         <input type="text" class="chat-input" id="chatInput" placeholder="Ask a follow-up question..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}" />
@@ -526,6 +529,7 @@ function showResults(markdown,frameNote,count,mode,titles,views){
   document.getElementById('resultsBody').innerHTML=parseMd(markdown);
   document.getElementById('chatMessages').innerHTML='<div class="chat-msg thinking">Ask me anything about this analysis — I have full context on the videos, transcripts, and frames.</div>';
   document.getElementById('resultsOverlay').classList.add('visible');
+  setTimeout(initChatResize,100);
 }
 
 function closeResults(e){
@@ -589,23 +593,36 @@ function renderHistory(){
     if(!groups[ch])groups[ch]=[];
     groups[ch].push(item);
   });
-  list.innerHTML=Object.entries(groups).map(([ch,items])=>
-    '<div style="margin-bottom:12px">'
-    +'<div style="font-family:var(--mono);font-size:10px;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;padding:0 2px">'+ch+'</div>'
+  list.innerHTML=Object.entries(groups).map(([ch,items],gi)=>{
+    const gid='hg-'+gi;
+    const clickAttr='onclick="toggleHistGroup(\'' + gid + '\')"';
+    return '<div style="margin-bottom:8px">'
+    +'<div style="display:flex;align-items:center;gap:6px;padding:6px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;cursor:pointer;margin-bottom:3px" '+clickAttr+'>'
+    +'<span style="font-family:var(--mono);font-size:10px;color:var(--accent);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+ch+'</span>'
+    +'<span style="font-family:var(--mono);font-size:9px;color:var(--text3)">'+items.length+'</span>'
+    +'<span style="font-size:9px;color:var(--text3)" id="arr-'+gid+'">▶</span>'
+    +'</div>'
+    +'<div id="'+gid+'" style="display:none;flex-direction:column;gap:3px;padding-left:6px">'
     +items.map(item=>'<div class="hist-item" onclick="loadHistory('+item.id+')">'
       +'<div class="hist-title">'+(item.titles||'Analysis')+'</div>'
       +'<div class="hist-meta">'+item.mode+' · '+item.date+'</div>'
       +'</div>').join('')
-    +'</div>'
-  ).join('');
+    +'</div></div>';
+  }).join('');
+}
+function toggleHistGroup(gid){
+  const el=document.getElementById(gid);
+  const arr=document.getElementById('arr-'+gid);
+  const open=el.style.display==='none';
+  el.style.display=open?'flex':'none';
+  arr.textContent=open?'▼':'▶';
 }
 function loadHistory(id){const item=analysisHistory.find(h=>h.id===id);if(item)showResults(item.analysis,'',0,item.mode,[],{});}
 
 // ── SAVED CHANNELS ─────────────────────────────────────────────────────────
 function saveChannel(){
-  const handle=currentChannel;
+  const handle=currentChannel; // already @handle from fetchShorts
   if(!handle)return;
-  // Check not already in a folder or saved
   const inFolder=folders.some(f=>f.channels&&f.channels.includes(handle));
   if(inFolder){showToast('Already in a folder','error');return;}
   if(savedChannels.includes(handle)){showToast('Already saved','error');return;}
@@ -634,7 +651,8 @@ function renderFolders(){
       +'<span class="folder-ch-rm" onclick="event.stopPropagation();removeFolderCh('+fi+','+ci+')">×</span>'
       +'</div>').join('');
     return '<div class="folder-item" id="folder-'+fi+'">'
-      +'<div class="folder-header" onclick="toggleFolder('+fi+')">'
+      +'<div class="folder-header" onclick="toggleFolder('+fi+')" '
+      +'ondragover="dragOverFolder(event,'+fi+')" ondragleave="dragLeaveFolder(event)" ondrop="dropOnFolder(event,'+fi+')">'
       +'<div class="folder-dot" style="background:'+f.color+'"></div>'
       +'<div class="folder-name">'+f.name+'</div>'
       +'<span style="font-size:10px;color:var(--text3);margin-right:4px">'+(f.channels||[]).length+'</span>'
@@ -731,6 +749,73 @@ function saveFolder(){
   }
   saveFolders();renderFolders();
   document.getElementById('folderModal').classList.remove('visible');
+}
+
+// ── DRAG & DROP ───────────────────────────────────────────────────────────
+let dragData=null;
+function dragChannel(e,ch,src,idx){
+  dragData={ch,src,idx};
+  e.dataTransfer.effectAllowed='move';
+  e.dataTransfer.setData('text/plain',ch);
+}
+function dragOverFolder(e,fi){
+  e.preventDefault();
+  e.currentTarget.style.borderColor='var(--accent)';
+  e.currentTarget.style.background='var(--accent-dim)';
+}
+function dragLeaveFolder(e){
+  e.currentTarget.style.borderColor='';
+  e.currentTarget.style.background='';
+}
+function dropOnFolder(e,fi){
+  e.preventDefault();
+  e.currentTarget.style.borderColor='';
+  e.currentTarget.style.background='';
+  if(!dragData)return;
+  const ch=dragData.ch;
+  if(!folders[fi].channels)folders[fi].channels=[];
+  if(folders[fi].channels.includes(ch)){showToast('Already in this folder','error');dragData=null;return;}
+  folders[fi].channels.push(ch);
+  if(dragData.src==='uncategorized'){
+    savedChannels.splice(dragData.idx,1);
+    localStorage.setItem('shortsiq_channels',JSON.stringify(savedChannels));
+    renderSavedChannels();
+  } else if(dragData.src!==fi){
+    // from another folder
+    const oldFi=dragData.src;
+    const oldIdx=folders[oldFi].channels.indexOf(ch);
+    if(oldIdx>-1)folders[oldFi].channels.splice(oldIdx,1);
+  }
+  saveFolders();renderFolders();showToast('Moved to '+folders[fi].name,'success');
+  dragData=null;
+}
+
+// ── CHAT RESIZE ────────────────────────────────────────────────────────────
+let isResizing=false,startY=0,startH=0;
+function initChatResize(){
+  const handle=document.getElementById('chatResizeHandle');
+  const chat=document.getElementById('chatSection');
+  if(!handle||!chat)return;
+  handle.addEventListener('mousedown',function(e){
+    isResizing=true;startY=e.clientY;startH=chat.offsetHeight;
+    document.body.style.userSelect='none';
+    document.addEventListener('mousemove',onResizeMove);
+    document.addEventListener('mouseup',onResizeUp);
+    e.preventDefault();
+  });
+}
+function onResizeMove(e){
+  if(!isResizing)return;
+  const chat=document.getElementById('chatSection');
+  const diff=startY-e.clientY; // drag up = bigger
+  const newH=Math.min(500,Math.max(120,startH+diff));
+  chat.style.maxHeight=newH+'px';
+}
+function onResizeUp(){
+  isResizing=false;
+  document.body.style.userSelect='';
+  document.removeEventListener('mousemove',onResizeMove);
+  document.removeEventListener('mouseup',onResizeUp);
 }
 
 // ── LOAD MORE ──────────────────────────────────────────────────────────────
