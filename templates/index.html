@@ -410,15 +410,18 @@ function showResults(markdown,frameNote,count,mode){
 function closeResults(e){if(!e||e.target===document.getElementById('resultsOverlay'))document.getElementById('resultsOverlay').classList.remove('visible');}
 function copyResults(){navigator.clipboard.writeText(currentResults).then(()=>showToast('Copied','success'));}
 function parseMd(t){
-  return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/^### (.+)$/gm,'<h3>$1</h3>').replace(/^## (.+)$/gm,'<h2>$1</h2>').replace(/^# (.+)$/gm,'<h1>$1</h1>')
-    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\*(.+?)\*/g,'<em>$1</em>')
-    .replace(/`(.+?)`/g,'<code>$1</code>').replace(/^---$/gm,'<hr>').replace(/^\> (.+)$/gm,'<blockquote>$1</blockquote>')
-    .replace(/^[-*] (.+)$/gm,'<li>$1</li>').replace(/^\d+\. (.+)$/gm,'<li>$1</li>')
-    .replace(/(<li>[\s\S]*?<\/li>
-?)+/g,'<ul>$&</ul>').replace(/
-
-/g,'<br><br>');
+  t=t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  t=t.replace(/^### (.+)$/gm,'<h3>$1</h3>');
+  t=t.replace(/^## (.+)$/gm,'<h2>$1</h2>');
+  t=t.replace(/^# (.+)$/gm,'<h1>$1</h1>');
+  t=t.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+  t=t.replace(/\*(.+?)\*/g,'<em>$1</em>');
+  t=t.replace(/`(.+?)`/g,'<code>$1</code>');
+  t=t.replace(/^---$/gm,'<hr>');
+  t=t.replace(/^&gt; (.+)$/gm,'<blockquote>$1</blockquote>');
+  t=t.replace(/^[\-\*] (.+)$/gm,'<li>$1</li>');
+  t=t.replace(/\n\n/g,'<br><br>');
+  return t;
 }
 
 function saveToHistory(analysis,titles,mode){
