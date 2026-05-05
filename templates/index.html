@@ -411,6 +411,16 @@ function closeResults(e){if(!e||e.target===document.getElementById('resultsOverl
 function copyResults(){navigator.clipboard.writeText(currentResults).then(()=>showToast('Copied','success'));}
 function parseMd(t){
   t=t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  // Tables
+  const tableRegex = /^(\|.+\|)\n(\|[-| :]+\|)\n((\|.+\|\n?)+)/gm;
+  t=t.replace(tableRegex, function(match, header, sep, rows){
+    const headers = header.split('|').filter(c=>c.trim()).map(c=>'<th>'+c.trim()+'</th>').join('');
+    const bodyRows = rows.trim().split('\n').map(row=>{
+      const cells = row.split('|').filter(c=>c.trim()).map(c=>'<td>'+c.trim()+'</td>').join('');
+      return '<tr>'+cells+'</tr>';
+    }).join('');
+    return '<table><thead><tr>'+headers+'</tr></thead><tbody>'+bodyRows+'</tbody></table>';
+  });
   t=t.replace(/^### (.+)$/gm,'<h3>$1</h3>');
   t=t.replace(/^## (.+)$/gm,'<h2>$1</h2>');
   t=t.replace(/^# (.+)$/gm,'<h1>$1</h1>');
@@ -433,7 +443,19 @@ function renderHistory(){
   const list=document.getElementById('historyList'),section=document.getElementById('historySection');
   if(!analysisHistory.length){section.style.display='none';return;}
   section.style.display='block';
-  list.innerHTML=analysisHistory.map(item=>`<div class="hist-item" onclick="loadHistory(${item.id})"><div class="hist-title">${item.titles||'Analysis'}</div><div class="hist-meta">${item.mode} · ${item.date}</div></div>`).join('');
+  // Group by channel
+  const groups={};
+  analysisHistory.forEach(item=>{
+    const ch=item.channel||'Unknown';
+    if(!groups[ch])groups[ch]=[];
+    groups[ch].push(item);
+  });
+  list.innerHTML=Object.entries(groups).map(([ch,items])=>`
+    <div style="margin-bottom:12px">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;padding:0 2px">${ch}</div>
+      ${items.map(item=>`<div class="hist-item" onclick="loadHistory(${item.id})"><div class="hist-title">${item.titles||'Analysis'}</div><div class="hist-meta">${item.mode} · ${item.date}</div></div>`).join('')}
+    </div>
+  `).join('');
 }
 function loadHistory(id){const item=analysisHistory.find(h=>h.id===id);if(item)showResults(item.analysis,'',0,item.mode);}
 

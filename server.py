@@ -168,25 +168,90 @@ def get_transcript(video_id: str) -> str:
 
 def run_analysis(videos_data: list, mode: str = "compare") -> str:
     if mode == "compare":
-        prompt = f"""You are an expert YouTube Shorts analyst. Analyze these {len(videos_data)} Shorts.
-1. Is performance driven by IDEATION or VISUALS? Give a % split.
-2. What separates high performers from low performers?
-3. Side-by-side table: Views, Hook, Stakes, Concept strength, Visual quality
-4. HEADLINE FINDING in one sentence
-5. 3 actionable recommendations
-Be direct. Reference actual titles and timestamps."""
+        prompt = f"""You are an elite YouTube Shorts growth strategist. Analyze these {len(videos_data)} Shorts with surgical precision.
+
+## PART 1: PERFORMANCE SPLIT
+State clearly: Is the performance gap driven by IDEATION or VISUALS? Give a % split with reasoning. Be specific — reference actual frames, hooks, and transcript lines.
+
+## PART 2: SIDE-BY-SIDE COMPARISON TABLE
+Create a markdown table with columns: Title | Views | Hook (first line) | Stakes | Concept Strength | Visual Quality | Verdict
+
+## PART 3: DEEP DIAGNOSIS
+For each HIGH performer — explain exactly WHY it worked:
+- What psychological trigger does the hook use? (curiosity gap, shock, relatability, FOMO, etc.)
+- What keeps viewers watching past 3 seconds?
+- What makes it shareable?
+
+For each LOW performer — explain exactly WHY it failed:
+- Where did viewers likely drop off and why?
+- What assumption did the creator make that was wrong?
+- Is it a concept problem, hook problem, or execution problem?
+
+## PART 4: PATTERN RECOGNITION
+What is the single winning formula this channel should replicate? Look for patterns across titles, hooks, thumbnails, pacing, and topics.
+
+## PART 5: HEADLINE FINDING
+One bold sentence that captures the core insight.
+
+## PART 6: ACTIONABLE GROWTH PLAN
+Give 5 specific, implementable recommendations with reasoning for each. Include:
+- Title formulas that work for this niche
+- Hook structures to steal from the winners
+- What to stop doing immediately
+- One untested idea that could 10x performance based on the data
+
+Be ruthless, specific, and reference actual video titles and timestamps. No generic advice."""
+
     elif mode == "retention":
-        prompt = """Analyze this Short for retention:
-1. DEAD ZONE MAP — every timestamp where viewers would leave
-2. First 2 seconds — what does a half-asleep scroller see?
-3. Rate Hook/Pacing/Visual variety/Audio hook each /10
-4. What to fix in order of impact. Be brutal."""
+        prompt = """You are a YouTube Shorts retention expert. Dissect this video frame by frame.
+
+## PART 1: FIRST 2 SECONDS AUDIT
+Describe exactly what a half-asleep, thumb-scrolling viewer sees in the first 2 seconds. Is there a visual hook? What emotion does it trigger? Would they stop scrolling?
+
+## PART 2: DEAD ZONE MAP
+List every timestamp range where viewers would leave, with specific reasons:
+- 0:00-0:XX — [what's happening] — [why viewers leave]
+Format as a table: Timestamp | What's on screen | Drop risk | Why
+
+## PART 3: RETENTION SCORES
+Rate each element /10 with specific reasoning:
+- Hook strength
+- Pacing
+- Visual variety
+- Audio hook
+- Pattern interrupts
+- Payoff delivery
+
+## PART 4: FIX PRIORITY LIST
+What to fix, in order of impact. For each fix: what's broken, what to do instead, and what result to expect.
+
+## PART 5: REWRITTEN HOOK
+Write 3 alternative opening lines that would perform better than the current one.
+
+Be brutal and specific. Reference actual frames and transcript lines."""
+
     else:
-        prompt = """Analyze this Short:
-1. Hook — first 2 seconds strength
-2. What's working / what isn't
-3. Virality score 1-10 and why
-4. What would make it 10x better?"""
+        prompt = """You are an elite YouTube Shorts analyst. Give a comprehensive breakdown.
+
+## PART 1: FIRST IMPRESSION
+What does a scroller see in 0.5 seconds? Would they stop? Why or why not?
+
+## PART 2: HOOK ANALYSIS
+Break down the opening hook line by line. What psychological trigger is being used? Rate it /10.
+
+## PART 3: CONTENT AUTOPSY
+What's working and why. What's not working and why. Be specific — reference frames and transcript.
+
+## PART 4: VIRALITY SCORE
+Score 1-10 with detailed reasoning across: Hook, Concept, Shareability, Rewatch value, Trend alignment.
+
+## PART 5: GROWTH THEORIES
+3 theories on why this video performed the way it did, based on what you see in the frames and transcript.
+
+## PART 6: 10X IMPROVEMENT PLAN
+Specific changes that would dramatically improve performance. Include rewritten title, rewritten hook, pacing suggestions, and thumbnail concept.
+
+Be direct, specific, and reference actual content from the video."""
 
     content = [{"type": "text", "text": prompt}]
     for vid in videos_data:
